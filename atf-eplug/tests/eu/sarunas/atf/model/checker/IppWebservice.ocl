@@ -1,0 +1,40 @@
+package org::inspection_plusplus
+
+context TolAngle
+    inv: criterion.oclIsUndefined() = false
+
+context IntervalToleranceCriterion
+	inv: upperToleranceValue > lowerToleranceValue
+
+context IPE
+	inv: name->size() < 3 and name->size() > 0
+	
+context IPESingle
+   inv: self.useLeft <> self.useRight
+   
+context IPEGeometric
+	inv: self.materialThickness > 0
+	
+context IPESurfacePoint
+	inv: self.calculationNominalElement -> size() = 1
+ 
+
+context CalculationNominalElement
+	inv: operation='IPELiesOn'
+	inv: operand -> size() = 2
+	inv: operand -> select(o: Operand | o.role = 'IPEIPE1' ) -> size() = 1
+	inv: operand -> select(o: Operand | o.role = 'IPEIPE2' ) -> size() = 1
+
+
+					
+--context InspectionPlan
+--    inv: self.qc->size() > 0
+--	inv: self.ipe->size() > 0
+--	inv: self.ipe->forAll(ipe: IPE | ipe.oclIsTypeOf(IPESurfacePoint) 
+--   		implies 
+--   			    tolerance->select(tolAxisPosX: Tolerance| tolAxisPosX.oclIsTypeOf(TolAxisPosX) ) -> size() >= 1
+--   			and tolerance->select(tolAxisPosY: Tolerance| tolAxisPosY.oclIsTypeOf(TolAxisPosY) ) -> size() >= 1
+--   			and tolerance->select(tolAxisPosZ: Tolerance| tolAxisPosZ.oclIsTypeOf(TolAxisPosZ) ) -> size() >= 1
+--   		)
+	  
+endpackage

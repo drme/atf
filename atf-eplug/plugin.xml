@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+	<extension point="org.eclipse.ui.commands">
+		<category id="eu.sarunas.atf.eclipse.commands.category" name="ATF Tests Generator"></category>
+		<command categoryId="eu.sarunas.atf.eclipse.commands.category" id="eu.sarunas.atf.eclipse.commands.sampleCommand" name="Generate Test Data"></command>
+	</extension>
+    
+	<extension point="org.eclipse.ui.handlers">
+		<handler class="eu.sarunas.atf.eclipse.handlers23.SampleHandler123" commandId="eu.sarunas.atf.eclipse.commands.sampleCommand">
+			<activeWhen>
+				<with variable="selection">
+					<iterate operator="and">
+						<instanceof value="org.eclipse.jdt.core.IJavaElement"></instanceof>
+					</iterate>
+				</with>
+			</activeWhen>              
+		</handler>
+	</extension>
+    
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+			<menu id="eu.sarunas.atf.eclipse.menus.sampleMenuPopup" label="ATF Tests Generator">
+				<command commandId="eu.sarunas.atf.eclipse.commands.sampleCommand" id="eu.sarunas.atf.eclipse.menus.sampleCommand"></command>
+			</menu>
+		</menuContribution>
+	</extension>
+
+
+
+
+
+
+   <extension
+         point="org.eclipse.ui.views">
+
+      
+      <view
+            name="TestsDB"
+            allowMultiple="false"
+            icon="icons/sample3.gif"
+            class="eu.sarunas.projects.atf.eclipse.NavigationView"
+            id="eu.sarunas.projects.atf.eclipse.navigationView">
+      </view>
+      
+   </extension>
+
+
+
+
+
+
+<!-- mantas' -->
+
+
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="eu.atac.atf.eclipse.GenerateTestHandler"
+            id="eu.etac.atf.eclipse.GenerateTestHandlerId"
+            name="Convert">
+      </command>
+   </extension>
+
+
+
+  
+  
+
+
+
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <command
+               commandId="eu.etac.atf.eclipse.GenerateTestHandlerId"
+               label="Generate Tests-OCL"
+               style="push">
+            <!--visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <adapt
+                           type="org.eclipse.jdt.internal.core.CompilationUnit">
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen-->
+         </command>
+      </menuContribution>
+   </extension>
+
+
+
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="atfeplug.WorkbenchPropertyPage1"
+            icon="icons/sample2.gif"
+            id="atf-eplug.page1"
+            name="name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="atfeplug.AbstractPreferenceInitializer1">
+      </initializer>
+   </extension>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- gretos -->
+
+   
+
+      <extension
+         point="org.eclipse.ui.popupMenus">
+   
+   
+
+
+      <objectContribution
+            objectClass="org.eclipse.jdt.core.ICompilationUnit"
+            id="ATGPlugin.contribution1">
+         <action
+               class="lt.atgplugin.popup.actions.GenerateTestCUAction"
+               enablesFor="+"
+               id="ATGPlugin.action1"
+               label="%action.label"
+               menubarPath="additions">
+         </action>
+         <action
+               label="%action.label.0"
+               class="lt.atgplugin.popup.actions.GenerateTestCUDefaultsAction"
+               menubarPath="additions"
+               enablesFor="+"
+               id="ATGPlugin.newAction">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="ATGPlugin.contribution2"
+            objectClass="org.eclipse.jdt.core.IPackageFragmentRoot">
+         <action
+               class="lt.atgplugin.popup.actions.GenerateTestCUAction"
+               enablesFor="+"
+               id="ATGPlugin.action1"
+               label="%action.label.1"
+               menubarPath="additions">
+         </action>
+         <action
+               class="lt.atgplugin.popup.actions.GenerateTestCUDefaultsAction"
+               enablesFor="+"
+               id="ATGPlugin.newAction"
+               label="%action.label.2"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="ATGPlugin.contribution3"
+            objectClass="org.eclipse.jdt.core.IPackageFragment">
+         <action
+               class="lt.atgplugin.popup.actions.GenerateTestCUAction"
+               enablesFor="+"
+               id="ATGPlugin.action1"
+               label="%action.label.3"
+               menubarPath="additions">
+         </action>
+         <action
+               class="lt.atgplugin.popup.actions.GenerateTestCUDefaultsAction"
+               enablesFor="+"
+               id="ATGPlugin.newAction"
+               label="%action.label.4"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+</extension>   
+   
+   
+
+
+   <!-- old actions -->
+   
+   
+    <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="atf-eplug.objectContribution4"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+         <action
+               class="eu.sarunas.atf.eclipse.actions.GenerateTestsMethodAction"
+               id="atf-eplug.action4"
+               label="Generate Tests for a Method"
+               icon="icons/contextmenu.gif"
+               menubarPath="additions"
+               enablesFor="1"
+               >
+         </action>
+         <visibility>
+               <objectClass
+                     name="org.eclipse.jdt.core.IMethod">
+               </objectClass>
+         </visibility>
+      </objectContribution>
+   </extension>   
+
+
+      <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="atf-eplug.objectContribution5"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+         <action
+               class="eu.sarunas.projects.atf.eclipse.actions.GenerateTestsClassAction"
+               id="atf-eplug.action5"
+               label="Generate Tests for a Class"
+               icon="icons/contextmenu.gif"
+               menubarPath="additions"
+               enablesFor="1"
+               >
+         </action>
+         <visibility>
+               <objectClass
+                     name="org.eclipse.jdt.core.IType">
+               </objectClass>
+         </visibility>
+      </objectContribution>
+   </extension>   
+   
+   
+   
+   
+   
+   
+   
+   
+
+
+
+
+<!-- tests DB -->
+
+
+ <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="atf-eplug.objectContribution1"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+         <action
+               class="eu.sarunas.projects.atf.eclipse.actions.TestsGenerateAction"
+               id="atf-eplug.action1"
+               label="Generate Project Tests"
+               icon="icons/contextmenu.gif"
+               menubarPath="additions"
+               enablesFor="1"
+               >
+         </action>
+         <visibility>
+               <objectClass
+                     name="org.eclipse.jdt.core.IJavaProject">
+               </objectClass>
+         </visibility>
+      </objectContribution>
+   </extension>
+   
+   
+   
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="atf-eplug.objectContribution2"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+         <action
+               class="eu.sarunas.projects.atf.eclipse.actions.TestsRemoveAction"
+               id="atf-eplug.action2"
+               label="Remove Tests"
+               icon="icons/contextmenu.gif"
+               menubarPath="additions"
+               enablesFor="1"
+               >
+         </action>
+         <visibility>
+               <objectClass
+                     name="org.eclipse.jdt.core.IJavaProject">
+               </objectClass>
+         </visibility>
+      </objectContribution>
+   </extension>   
+   
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="atf-eplug.objectContribution3"
+            objectClass="org.eclipse.core.runtime.IAdaptable">
+         <action
+               class="eu.sarunas.projects.atf.eclipse.actions.TestsTransformToJavaAction"
+               id="atf-eplug.action3"
+               label="Transform Tests to JUnit"
+               icon="icons/contextmenu.gif"
+               menubarPath="additions"
+               enablesFor="1"
+               >
+         </action>
+         <visibility>
+               <objectClass
+                     name="org.eclipse.jdt.core.IJavaProject">
+               </objectClass>
+         </visibility>
+      </objectContribution>
+   </extension>
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</plugin>

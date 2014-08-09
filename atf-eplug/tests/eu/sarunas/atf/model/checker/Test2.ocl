@@ -1,0 +1,8 @@
+package test::model
+
+context Account
+	inv positiveBalance: self.balance >= 0
+	inv holderAge: self.holder.age >= 18
+
+
+endpackage

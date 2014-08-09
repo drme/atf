@@ -1,0 +1,44 @@
+context Account::addMoney(money)
+pre: money.amount > 0
+post: self.balance.amount > self.balance.amount@pre
+
+context Account::removeMoney(money)
+pre: money.amount > 0
+post: self.balance.ammount < self.balance.ammount@pre
+
+context CheckingAccount
+inv: balance >= overdraftLimit
+inv: overdraftLimit <= 0
+
+context SavingAccount
+inv: balance >= 0
+inv: interestRate >= 0
+inv: interestRate < 100
+
+context SavingAccount::addInterest
+post: self.balance.amount >= self.balance.amount@pre;
+
+context Money::getFraction
+post: result > -100
+post: result < 100
+
+context Money::add(Money money)
+pre: money.amount > 0
+post: selft.amount > self.amount@pre
+
+context Money::sub(Money money)
+pre: money.amount > 0
+post: self.amount < self.amount@pre
+
+context Bank::transfer(Account from, Account to, Money money)
+pre: money.amount > 0
+post: from.balance < from.balance@pre
+post: to.balance > to.balance@pre 
+
+context ATM::deposit(Account account, Money money)
+pre: money.amount > 0
+post: account.balance > account.balance@pre
+
+context ATM::withdraw(Account account, Money money)
+pre: money.amount > 0
+post: account.balance < account.balance@pre

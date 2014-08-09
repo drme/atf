@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/automaton.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xeger-1.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.access_1.2.0.201009131109.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.commons.antlr3_2_0_1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.kiama.attribution_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/scala-library.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.essentialocl_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.examples.simple_3.1.0.201101171055.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.interpreter_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl.resource.ocl_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl.semantics_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl.staticsemantics_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.metamodels.ecore_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.metamodels.java_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.metamodels.uml2_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.metamodels.xsd_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.model_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstance_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.ecore_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.java_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.xml_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.parser_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.pivotmodel_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.pivotmodel.semantics_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.standardlibrary.java_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.codegen_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.codegen.declarativ_3.0.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.codegen.declarativ.ocl2sql_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.codegen.ocl2java_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.codegen.ocl2java.types_3.0.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.CWM_3.0.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.template_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.template.sql_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.transformation_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.log4j_1.2.13.v200903072027.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/stringtemplate.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="tests"/>
+	<classpathentry kind="lib" path="lib/eclipselink.jar"/>
+	<classpathentry kind="lib" path="lib/javax.persistence_1.99.0.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.2-beta-bin.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.commons.lang_2.3.0.v200803061910.jar"/>
+	<classpathentry kind="lib" path="lib/persistence.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

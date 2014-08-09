@@ -1,0 +1,23 @@
+package eu.sarunas.atf.generators.tests.data;
+
+import eu.sarunas.projects.atf.metadata.generic.Type;
+
+public class BooleanGenerator extends NumberGenerator
+{
+	public BooleanGenerator(Randomizer randomizer)
+	{
+		super(randomizer, 0, 1);
+	};
+
+	public Object generate(Type type)
+	{
+		if (generate() > 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};
+};

@@ -1,0 +1,14 @@
+1. tests database
+2. tests generator
+3. software metadata
+4. tests runner (transformation db->junit?)
+4.1. TestsDB transformation to any unit tests framework
+5.1. generated test data visualizer ? (show object diagram with values)
+
+
+PLAN:
++/- 1. code meta data.
++/- 1.1. metadata parser from java.
+2. tests db
+3. generator (random).
+4. runner.
