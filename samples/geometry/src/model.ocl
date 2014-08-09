@@ -1,0 +1,4 @@
+context eu::sarunas::atf::demo::geometry::shapes::Triangle
+inv: self.a > 0
+inv: self.b > 0
+inv: self.c > 0
