@@ -307,7 +307,16 @@ public class TestsGenerateAction extends BaseAction
 						
 						if (null != cl)
 						{
-							eu.sarunas.atf.meta.tests.TestSuite ts = tg.generate(cl, testProject, "");
+							eu.sarunas.atf.meta.tests.TestSuite ts = null;
+              try
+              {
+	              ts = tg.generate(cl, testProject, "");
+              }
+              catch (Exception e)
+              {
+	              // TODO Auto-generated catch block
+	              e.printStackTrace();
+              }
 							
 							testProject.getTestSuites().add(ts);
 						

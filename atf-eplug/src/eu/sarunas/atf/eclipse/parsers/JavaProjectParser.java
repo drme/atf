@@ -405,7 +405,7 @@ public class JavaProjectParser implements IModelParser
 		}
 	}*/
 	
-	private Class getClass(String className)
+	private Class getClass(String className) throws JavaModelException
 	{
 //		Class type = getClass(className, null); 
 				//findClass(className);
@@ -501,10 +501,9 @@ public class JavaProjectParser implements IModelParser
 	 * 
 	 * @param classFullName class name in format package.package.ClassName.
 	 * @param sourceElement source element of this class.
-
 	 * @return discovered or created class.
 	 */
-	private Class getClass(String classFullName, Object sourceElement)
+	private Class getClass(String classFullName, IType sourceElement) throws JavaModelException
 	{
 		Package pckge = null;
 		String className = null;
@@ -525,7 +524,14 @@ public class JavaProjectParser implements IModelParser
 		
 		if (null == cls)
 		{
-			cls = new Class(className, 0, pckge, sourceElement);
+			if ((null != sourceElement) && (true == sourceElement.isEnum()))
+			{
+				cls = new eu.sarunas.atf.meta.sut.Enum(className, 0, pckge, sourceElement);
+			}
+			else
+			{
+				cls = new Class(className, 0, pckge, sourceElement);
+			}
 			
 			pckge.addClass(cls);
 		}

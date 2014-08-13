@@ -24,6 +24,7 @@ import eu.atac.atf.test.ocl.ConstraintParser;
 import eu.atac.atf.test.ocl.pattern.ConstrainPatternBase;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Package;
+import eu.sarunas.atf.utils.Logger;
 
 public class Generate {
 	
@@ -31,12 +32,12 @@ public class Generate {
 		List<Constraint> constraintList = null;
 		try{
 			if(modelFile == null || !modelFile.exists()){
-				ATF.log("Model class file does not exist. Please build your project. ");
+				Logger.logger.severe("Model class file does not exist. Please build your project. ");
 				return null;
 			}
 			
 			if(oclFile == null || !oclFile.exists()){
-				ATF.log("Ocl file does not exist");
+				Logger.logger.severe("Ocl file does not exist");
 				return null;
 			}
 

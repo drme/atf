@@ -61,6 +61,7 @@ import eu.sarunas.atf.meta.sut.Class;
 
 import eu.sarunas.atf.meta.sut.Package;
 import eu.sarunas.atf.meta.sut.Project;
+import eu.sarunas.atf.utils.Logger;
 
 
 @SuppressWarnings("restriction")
@@ -101,7 +102,7 @@ public class GenerateTestHandler extends AbstractHandler {
 				CompilationUnit unit = (CompilationUnit) firstElement;
 
 				if(!validateCompiliationUnit(unit)){
-					ATF.log("Can not generate test for test.");
+					Logger.logger.severe("Can not generate test for test.");
 					return null;
 				}
 
@@ -398,8 +399,8 @@ public class GenerateTestHandler extends AbstractHandler {
 				//org.junit.runner.Result result = (Result) method.invoke(null, new Object[] {param});
 				
 			} catch (Exception e) {
-				ATF.log(e.getMessage());
-				ATF.log(e.getMessage());
+				Logger.logger.severe(e.getMessage());
+				Logger.logger.severe(e.getMessage());
 			}
 
 			//org.junit.runner.Result result = JUnitCore.runClasses(clz);
@@ -407,10 +408,10 @@ public class GenerateTestHandler extends AbstractHandler {
 			
 			return clazz;
 		} catch (IllegalArgumentException e) {
-			ATF.log(e.getMessage());
-			ATF.log(e.getMessage());
+			Logger.logger.severe(e.getMessage());
+			Logger.logger.severe(e.getMessage());
 		} catch (Exception e) {
-			ATF.log(e);
+			Logger.log(e);
 		}
 		return null;
     }

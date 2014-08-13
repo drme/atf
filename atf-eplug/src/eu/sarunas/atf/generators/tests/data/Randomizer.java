@@ -47,6 +47,11 @@ public class Randomizer
 			return generator.generate(type);
 		}
 
+		if (type instanceof eu.sarunas.atf.meta.sut.Enum)
+		{
+			return this.enumGenerator.generate(type);
+		}
+		
 		if (type instanceof eu.sarunas.atf.meta.sut.Class)
 		{
 			return this.compositeGenerator.generate(type);
@@ -63,4 +68,5 @@ public class Randomizer
 	private HashMap<Class<? extends Type>, ITypeGenerator> generators = new HashMap<Class<? extends Type>, ITypeGenerator>();
 	private IDistribution distribution = new GaussDistribution();
 	private CompositeGenerator compositeGenerator = new CompositeGenerator(this);
+	private EnumGenerator enumGenerator = new EnumGenerator(this);
 };

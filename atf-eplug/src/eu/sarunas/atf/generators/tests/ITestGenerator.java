@@ -9,5 +9,5 @@ public interface ITestGenerator
 	/**
 	 * Generates tests for a method
 	 */
-	public TestSuite generate(Method method, ITestsGeneratorManager manager, TestProject project);
+	public TestSuite generate(Method method, ITestsGeneratorManager manager, TestProject project) throws Exception;
 };

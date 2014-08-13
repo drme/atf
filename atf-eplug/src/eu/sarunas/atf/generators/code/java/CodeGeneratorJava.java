@@ -22,6 +22,7 @@ import eu.sarunas.atf.meta.sut.body.MethodCall;
 import eu.sarunas.atf.meta.sut.body.MethodCallParameter;
 import eu.sarunas.atf.meta.sut.body.ObjectConstruct;
 import eu.sarunas.atf.meta.testdata.TestObjectCollection;
+import eu.sarunas.atf.meta.testdata.TestObjectEnumValue;
 import eu.sarunas.atf.meta.testdata.TestObjectSimple;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
@@ -97,7 +98,7 @@ public class CodeGeneratorJava implements ICodeGenerator
     
     private String formatAssert(Assert assrt, int tabs)
     {
-    	return getTabs(tabs) + "junit.framework.Assert.assertTrue(false);\n";
+    	return getTabs(tabs) + "junit.framework.Assert.fail();\n";
     };
     
     private String formatObjectConstruct(ObjectConstruct objectConstruct, int tabs)
@@ -188,9 +189,9 @@ public class CodeGeneratorJava implements ICodeGenerator
     };
     
 	private String formatUnhandledCode(ICodeBodyElement codeBodyElement, int tabs)
-    {
-    	return getTabs(tabs) + "// unknown code " + codeBodyElement.getClass().toString();    	
-    };
+	{
+		return getTabs(tabs) + "// unknown code " + codeBodyElement.getClass().toString();
+	};
     
     // TODO make private
     public static String toString(Object object)
@@ -259,6 +260,10 @@ public class CodeGeneratorJava implements ICodeGenerator
     	else if (object instanceof ObjectConstruct)
     	{
     		return ((ObjectConstruct)object).getObjectName();
+    	}
+    	else if (object instanceof TestObjectEnumValue)
+    	{
+    		return formatClassName((Class)((TestObjectEnumValue)object).getType()) + "." + ((TestObjectEnumValue)object).getValue().toString();
     	}
     	else if (object instanceof TestObjectSimple<?>)
     	{
@@ -332,66 +337,66 @@ public class CodeGeneratorJava implements ICodeGenerator
     	}
     };
     
-    private String formatClassName(Class clss)
-    {
-    	String packageName = formatPackageName(clss.getPackage());
-    	String name= null;
-    	
-    	if (clss instanceof ParameterizedClass)
-    	{
-    		ParameterizedClass pc = (ParameterizedClass)clss;
-    		
-    		name = clss.getName() + "<";
-    		
-    		if (pc.getParameters().size() > 0)
-    		{
-    			Type p0 = pc.getParameters().get(0);
-    			
-    			if (p0 instanceof Class)
-    			{
-    				name += formatClassName((Class)p0);
-    			}
-    			else
-    			{
-    				name += p0.getFullName();
-    			}
-    			
-    			for (int i = 1; i < pc.getParameters().size(); i++)
-    			{
-        			Type p = pc.getParameters().get(i);
-        			
-        			if (p instanceof Class)
-        			{
-        				name += formatClassName((Class)p);
-        			}
-        			else
-        			{
-        				name += ", " + p.getFullName();
-        			}
-    			}
-    		}
-    		
-    		name += ">";
-    	}
-    	else
-    	{
-    		name = clss.getName();
-    	}
-    	
-    	if (packageName.length() > 0)
-    	{
-    		return packageName + "." + name;
-    	}
-    	else
-    	{
-    		return name;
-    	}
-    };
+	private static String formatClassName(Class clss)
+	{
+		String packageName = formatPackageName(clss.getPackage());
+		String name = null;
 
-    private String formatPackageName(eu.sarunas.atf.meta.sut.Package package1)
-    {
-    	return package1.getName();
-    };
+		if (clss instanceof ParameterizedClass)
+		{
+			ParameterizedClass pc = (ParameterizedClass) clss;
+
+			name = clss.getName() + "<";
+
+			if (pc.getParameters().size() > 0)
+			{
+				Type p0 = pc.getParameters().get(0);
+
+				if (p0 instanceof Class)
+				{
+					name += formatClassName((Class) p0);
+				}
+				else
+				{
+					name += p0.getFullName();
+				}
+
+				for (int i = 1; i < pc.getParameters().size(); i++)
+				{
+					Type p = pc.getParameters().get(i);
+
+					if (p instanceof Class)
+					{
+						name += formatClassName((Class) p);
+					}
+					else
+					{
+						name += ", " + p.getFullName();
+					}
+				}
+			}
+
+			name += ">";
+		}
+		else
+		{
+			name = clss.getName();
+		}
+
+		if (packageName.length() > 0)
+		{
+			return packageName + "." + name;
+		}
+		else
+		{
+			return name;
+		}
+	};
+
+	private static String formatPackageName(eu.sarunas.atf.meta.sut.Package packge)
+	{
+		return packge.getName();
+	};
 
     private String formatAnnotation(String annotation, int tabs)
     {

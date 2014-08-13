@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/automaton.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xeger-1.0-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.access_1.2.0.201009131109.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.commons.antlr3_2_0_1.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/org.kiama.attribution_3.1.0.201101171054.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/scala-library.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.logging_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.essentialocl_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar"/>
@@ -39,11 +34,21 @@
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.template.sql_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.transformation_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/automaton.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xeger-1.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.access_1.2.0.201009131109.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.emftext.commons.antlr3_2_0_1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/org.kiama.attribution_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/scala-library.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.apache.log4j_1.2.13.v200903072027.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/stringtemplate.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
+		<accessrules>
+			<accessrule kind="accessible" pattern="**"/>
+		</accessrules>
+	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="src" path="tests"/>

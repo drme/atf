@@ -1,6 +1,6 @@
 package eu.atac.atf.main;
 
-
+@Deprecated
 public class ATF {
 	public static final String ATF_LOG4JAVA_FILE = "log4j.properties";
 	public static final String ATF_OCL_FILE_EXTENSION = "ocl";
@@ -36,9 +36,13 @@ public class ATF {
 	public static final int VARIAVLE_ID_OBJECT_3    = 1003; 
 	public static final int VARIAVLE_ID_OBJECT_4    = 1004; 
 	
+	@Deprecated
 	public static final String JAVA_TYPE_INT           = "int"; 
+	@Deprecated
 	public static final String JAVA_TYPE_DOUBLE        = "double"; 
+	@Deprecated
 	public static final String JAVA_TYPE_BOOLEAN       = "boolean"; 
+	@Deprecated
 	public static final String JAVA_TYPE_VOID          = "void"; 
 	
 	
@@ -55,10 +59,7 @@ public class ATF {
 		System.err.println(ex.getMessage());
 		ex.printStackTrace(System.err);
 	}
-	public static void log(String message){
-		System.out.println(message);
-	}
-	
+
 	//UTIL
 	public static String firstToUpper(String s){
 		if(hasLenght(s)){

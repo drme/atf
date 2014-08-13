@@ -26,6 +26,7 @@ import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Field;
 
 import eu.sarunas.atf.meta.sut.Method;
+import eu.sarunas.atf.utils.Logger;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public abstract class ConstrainPatternBase {
@@ -287,7 +288,7 @@ public abstract class ConstrainPatternBase {
 							s.insert(0, ".get(" + indexAt.getIntegerSymbol() +")" + "." + method.getName() +"()" );
 						}						
 					}catch (Exception e){
-						ATF.log(e.getMessage());
+						Logger.logger.severe(e.getMessage());
 						throw new ATFException(ATFException.ATF_UNIMPLEMENTED_CODE_1000);
 					}
 				}else if(operationName.equals("oclAsType")){ 

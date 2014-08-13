@@ -1,0 +1,11 @@
+1. add junit4.jar to the project.
+2. check if project java5 and junit is avialable.
+3. constructor for setting field values
+4. scan for models and merge them instead of using model.ocl
+5. give-up on generation on invalid ocl
+6. enums generartion.
+7. static methods test - no instance.
+8. abstract classes, interfaces generation.
+9. interface parsing.
+a. pass IJavaProject to dresden ocl instead of trashy manual xsd.
+b. generate tests for interface methods.

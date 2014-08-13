@@ -28,6 +28,9 @@ Bundle-ClassPath: .,
  plugins/org.emftext.commons.antlr3_2_0_1.0.0.jar,
  plugins/org.kiama.attribution_3.1.0.201101171054.jar,
  plugins/scala-library.jar,
+ lib/xeger-1.0-SNAPSHOT.jar,
+ lib/automaton.jar,
+ plugins/tudresden.ocl20.logging_3.1.0.201101171054.jar,
  plugins/tudresden.ocl20.pivot.essentialocl_3.1.0.201101171054.jar,
  plugins/tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar,
  plugins/tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar,
@@ -60,7 +63,5 @@ Bundle-ClassPath: .,
  plugins/tudresden.ocl20.pivot.tools.template_3.1.0.201101171054.jar,
  plugins/tudresden.ocl20.pivot.tools.template.sql_3.1.0.201101171054.jar,
  plugins/tudresden.ocl20.pivot.tools.transformation_3.1.0.201101171054.jar,
- plugins/tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar,
- lib/xeger-1.0-SNAPSHOT.jar,
- lib/automaton.jar
+ plugins/tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar
 Bundle-Vendor: sarunas.eu

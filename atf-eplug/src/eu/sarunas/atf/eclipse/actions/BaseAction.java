@@ -60,9 +60,7 @@ public abstract class BaseAction implements IObjectActionDelegate
 				try
 				{
 					monitor.beginTask(BaseAction.this.taskName, IProgressMonitor.UNKNOWN);
-
 					executeAction(monitor);
-
 					monitor.done();
 
 					Boolean isModal = (Boolean) this.getProperty(IProgressConstants.PROPERTY_IN_DIALOG);

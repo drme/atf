@@ -1,11 +1,13 @@
 package eu.sarunas.atf.generators.code.xsd;
 
+import java.util.HashMap;
 import org.apache.commons.lang.NotImplementedException;
-import eu.atac.atf.main.XMLElement;
 import eu.sarunas.atf.generators.code.ICodeGenerator;
+import eu.sarunas.atf.generators.code.xml.XmlElement;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Field;
 import eu.sarunas.atf.meta.sut.Package;
+import eu.sarunas.atf.meta.sut.Project;
 import eu.sarunas.atf.meta.sut.basictypes.*;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
@@ -17,174 +19,226 @@ public class TransformerXSD implements ICodeGenerator
 		return null;
 	};
 
-	public String generatePackage(Package pckg)
+	private String getNameSpaceName(Package packge)
 	{
-		String namespace = null;
-
-		if (pckg.getName() == null || pckg.getName().trim().length() == 0)
+		if (packge.getName() == null || packge.getName().trim().length() == 0)
 		{
-			namespace = DEFAULT_PACKAGE_NAME;
+			return DEFAULT_PACKAGE_NAME;
 		}
 		else
 		{
-			namespace = pckg.getName().replaceAll("[\\._]", "");
+			return packge.getName().replaceAll("[\\._]", "");
+		}
+	};
+	
+	private String getClassName(Class clss, HashMap<Package, String> packageToNameSpaveMap, Package defaultPackage)
+	{
+		if (clss.getPackage() == defaultPackage)
+		{
+			return clss.getName();
+		}
+		else
+		{
+			return packageToNameSpaveMap.get(clss.getPackage()) + ":" + clss.getName();
+		}
+	};
+	
+	public String generateProject(Project project)
+	{
+		Package defaultPackage = project.getPackages().iterator().next();
+
+		for (Package packge : project.getPackages())
+		{
+			if (packge.getClasses().size() > 0)
+			{
+				defaultPackage = packge;
+				break;
+			}
 		}
 
-		XMLElement xml = new XMLElement("xs:schema");
-		
+		String targetNamespace = getNameSpaceName(defaultPackage);
+
+		HashMap<Package, String> packageToNameSpaveMap = new HashMap<Package, String>();
+		packageToNameSpaveMap.put(defaultPackage, targetNamespace);
+
+		XmlElement xml = new XmlElement("xs:schema");
+
 		xml.addParam("xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"");
 		xml.addParam("elementFormDefault=\"qualified\"");
-		xml.addParam("xmlns=\"urn:" + namespace + "\"");
-		xml.addParam("targetNamespace=\"urn:" + namespace + "\"");
-		
+		xml.addParam("xmlns=\"urn:" + targetNamespace + "\"");
+		xml.addParam("targetNamespace=\"urn:" + targetNamespace + "\"");
+
+		int namespaceId = 0;
+
+		for (Package packge : project.getPackages())
+		{
+			if (packge != defaultPackage)
+			{
+				xml.addParam("xmlns:ns" + namespaceId + "=\"urn:" + getNameSpaceName(packge) + "\"");
+				packageToNameSpaveMap.put(packge, "ns" + namespaceId);
+				namespaceId++;
+			}
+		}
+
 		boolean clsObject = false;
 
-		for (Class cls : pckg.getClasses())
+		for (Package pckg : project.getPackages())
 		{
-			if(cls.getName().equals("Object")){
-				clsObject = true;
-			}
-			
-			XMLElement classTag = new XMLElement("xs:complexType");
-			classTag.addParam("name=\"" + cls.getName() + "\"");
-			XMLElement parrentField = classTag;
 
-			if (cls.getSuperClass() != null)
+			for (Class cls : pckg.getClasses())
 			{
-				XMLElement complexContentTag = new XMLElement("xs:complexContent");
-				XMLElement extensionTag = new XMLElement("xs:extension");
-				extensionTag.addParam("base=\"" + cls.getSuperClass().getName() + "\"");//type -> base
-				complexContentTag.addChild(extensionTag);
-				classTag.addChild(complexContentTag);
-				parrentField = extensionTag;
-			}
-//???			
-//			else
-//			{
-//				XMLElement complexContentTag = new XMLElement("xs:complexContent");
-//				XMLElement extensionTag = new XMLElement("xs:extension");
-//				extensionTag.addParam("base=\"Object\"");//type -> base
-//				complexContentTag.addChild(extensionTag);
-//				classTag.addChild(complexContentTag);
-//				parrentField = extensionTag;
-//			}
-
-			if (cls.getFields().size() > 0)
-			{
-				XMLElement sequenceTag = new XMLElement("xs:sequence");
-				parrentField.addChild(sequenceTag);
-
-				for (Field field : cls.getFields())
+				if (cls.getName().equals("Object"))
 				{
-					XMLElement elementTag = new XMLElement("xs:element");
-					elementTag.addParam("name=\"" + field.getName() + "\"");
-					Type fieldType = field.getType();
-					
-					if (fieldType instanceof CollectionType)
+					clsObject = true;
+				}
+
+				XmlElement classTag = new XmlElement("xs:complexType");
+				classTag.addParam("name=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
+				XmlElement parrentField = classTag;
+
+				if (cls.getSuperClass() != null)
+				{
+					XmlElement complexContentTag = new XmlElement("xs:complexContent");
+					XmlElement extensionTag = new XmlElement("xs:extension");
+					extensionTag.addParam("base=\"" + getClassName((Class) cls.getSuperClass(), packageToNameSpaveMap, defaultPackage) + "\"");// type -> base
+					complexContentTag.appendChild(extensionTag);
+					classTag.appendChild(complexContentTag);
+					parrentField = extensionTag;
+				}
+				// ???
+				// else
+				// {
+				// XMLElement complexContentTag = new XMLElement("xs:complexContent");
+				// XMLElement extensionTag = new XMLElement("xs:extension");
+				// extensionTag.addParam("base=\"Object\"");//type -> base
+				// complexContentTag.addChild(extensionTag);
+				// classTag.addChild(complexContentTag);
+				// parrentField = extensionTag;
+				// }
+
+				if (cls.getFields().size() > 0)
+				{
+					XmlElement sequenceTag = new XmlElement("xs:sequence");
+					parrentField.appendChild(sequenceTag);
+
+					for (Field field : cls.getFields())
 					{
-						CollectionType ct = (CollectionType) fieldType;
-						if(ct.getEnclosingType() instanceof CollectionType)
+						XmlElement elementTag = new XmlElement("xs:element");
+						elementTag.addParam("name=\"" + field.getName() + "\"");
+						Type fieldType = field.getType();
+
+						if (fieldType instanceof CollectionType)
 						{
-							XMLElement rootElementTag = elementTag;
-							rootElementTag.addParam(" minOccurs=\"0\" ");
-							rootElementTag.addParam(" maxOccurs=\"unbounded\" ");
-							
-							fieldType = ct.getEnclosingType();
-							while(fieldType instanceof CollectionType)
+							CollectionType ct = (CollectionType) fieldType;
+							if (ct.getEnclosingType() instanceof CollectionType)
 							{
-								XMLElement complexTypeMultiTag = new XMLElement("xs:complexType");
-								XMLElement sequenceMultiTag = new XMLElement("xs:sequence");
-								
-								complexTypeMultiTag.addChild(sequenceMultiTag);
-								elementTag.addChild(complexTypeMultiTag);
-								
-								ct = (CollectionType) fieldType; 
+								XmlElement rootElementTag = elementTag;
+								rootElementTag.addParam(" minOccurs=\"0\" ");
+								rootElementTag.addParam(" maxOccurs=\"unbounded\" ");
+
 								fieldType = ct.getEnclosingType();
-								
-								elementTag = sequenceMultiTag;
+								while (fieldType instanceof CollectionType)
+								{
+									XmlElement complexTypeMultiTag = new XmlElement("xs:complexType");
+									XmlElement sequenceMultiTag = new XmlElement("xs:sequence");
+
+									complexTypeMultiTag.appendChild(sequenceMultiTag);
+									elementTag.appendChild(complexTypeMultiTag);
+
+									ct = (CollectionType) fieldType;
+									fieldType = ct.getEnclosingType();
+
+									elementTag = sequenceMultiTag;
+								}
+								XmlElement elementMultiTag = new XmlElement("xs:element");
+								elementMultiTag.addParam("name=\"" + field.getName() + "\"");// ?
+								elementMultiTag.addParam(" minOccurs=\"0\" ");
+								elementMultiTag.addParam(" maxOccurs=\"unbounded\" ");
+
+								elementMultiTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
+								rootElementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
+
+								elementTag.appendChild(elementMultiTag);
+
+								elementTag = rootElementTag;
 							}
-							XMLElement elementMultiTag = new XMLElement("xs:element");
-							elementMultiTag.addParam("name=\"" + field.getName() + "\"");//?
-							elementMultiTag.addParam(" minOccurs=\"0\" ");
-							elementMultiTag.addParam(" maxOccurs=\"unbounded\" ");
-							
-							elementMultiTag.addParam(" type=\"" + getXSDType(ct.getEnclosingType()) + "\" ");
-							rootElementTag.addParam(" type=\"" + getXSDType(ct.getEnclosingType()) + "\" ");
-							
-							elementTag.addChild(elementMultiTag);
-							
-							elementTag = rootElementTag;
+							else
+							{
+								elementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
+								elementTag.addParam(" minOccurs=\"0\" ");
+								elementTag.addParam(" maxOccurs=\"unbounded\" ");
+							}
 						}
 						else
 						{
-							elementTag.addParam(" type=\"" + getXSDType(ct.getEnclosingType()) + "\" ");
-							elementTag.addParam(" minOccurs=\"0\" ");
-							elementTag.addParam(" maxOccurs=\"unbounded\" ");
+							elementTag.addParam("type=\"" + getXsdType(fieldType, packageToNameSpaveMap, defaultPackage) + "\"");
 						}
+
+						sequenceTag.appendChild(elementTag);
 					}
-					else
-					{
-						elementTag.addParam("type=\""+ getXSDType(fieldType)+ "\"");
-					}
-					
-					
-					sequenceTag.addChild(elementTag);
 				}
+				xml.appendChild(classTag);
 			}
-			xml.addChild(classTag);
 		}
-		
-		if(!clsObject){
-			XMLElement complexTag = new XMLElement("xs:complexType");
-			complexTag.addParam("name=\"Object\"");
-			xml.addChild(complexTag);
-		}
-		
-		
-//		XMLElement textTag = new XMLElement("xs:simpleType");
-//		textTag.addParam("name=\"Text\"");
-//		XMLElement restrictionTag = new XMLElement("xs:restriction");
-//		restrictionTag.addParam("base=\"xs:string\"");
-//		XMLElement minlTag = new XMLElement("xs:minLength");
-//		minlTag.addParam("value=\"1\"");
-//		XMLElement maxlTag = new XMLElement("xs:maxLength");
-//		maxlTag.addParam("value=\"100\"");
-//		textTag.addChild(restrictionTag);
-//		textTag.addChild(minlTag);
-//		textTag.addChild(maxlTag);
-//		xml.addChild(textTag);
-		
-		
-		XMLElement headTag = new XMLElement("xs:complexType");
-		headTag.addParam("name=\"HEAD\"");
-		XMLElement sequenceTag = new XMLElement("xs:sequence");
-		headTag.addChild(sequenceTag);
-		
-		XMLElement choiceTag = new XMLElement("xs:choice");
-		sequenceTag.addChild(choiceTag);
-		sequenceTag = choiceTag;
-		
-		for (Class cls : pckg.getClasses())
+
+		if (!clsObject)
 		{
-			XMLElement elementTag = new XMLElement("xs:element");
-			elementTag.addParam("name=\"" + cls.getName() + "\"");
-			elementTag.addParam("type=\"" + cls.getName() + "\"");
-			elementTag.addParam("minOccurs=\"0\"");
-			elementTag.addParam("maxOccurs=\"unbounded\"");
-			sequenceTag.addChild(elementTag);
+			XmlElement complexTag = new XmlElement("xs:complexType");
+			complexTag.addParam("name=\"Object\"");
+			xml.appendChild(complexTag);
 		}
-		xml.addChild(headTag);	
-		
-		StringBuilder s = new StringBuilder(1000);
-		s.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		xml.toString(s, "");
-		return  s.toString();
+
+		// XMLElement textTag = new XMLElement("xs:simpleType");
+		// textTag.addParam("name=\"Text\"");
+		// XMLElement restrictionTag = new XMLElement("xs:restriction");
+		// restrictionTag.addParam("base=\"xs:string\"");
+		// XMLElement minlTag = new XMLElement("xs:minLength");
+		// minlTag.addParam("value=\"1\"");
+		// XMLElement maxlTag = new XMLElement("xs:maxLength");
+		// maxlTag.addParam("value=\"100\"");
+		// textTag.addChild(restrictionTag);
+		// textTag.addChild(minlTag);
+		// textTag.addChild(maxlTag);
+		// xml.addChild(textTag);
+
+		XmlElement headTag = new XmlElement("xs:complexType");
+		headTag.addParam("name=\"HEAD\"");
+
+		XmlElement sequenceTag = new XmlElement("xs:sequence");
+		headTag.appendChild(sequenceTag);
+
+		XmlElement choiceTag = new XmlElement("xs:choice");
+		sequenceTag.appendChild(choiceTag);
+		sequenceTag = choiceTag;
+
+		for (Package pckg : project.getPackages())
+		{
+			for (Class cls : pckg.getClasses())
+			{
+				XmlElement elementTag = new XmlElement("xs:element");
+				elementTag.addParam("name=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
+				elementTag.addParam("type=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
+				elementTag.addParam("minOccurs=\"0\"");
+				elementTag.addParam("maxOccurs=\"unbounded\"");
+				sequenceTag.appendChild(elementTag);
+			}
+		}
+
+		xml.appendChild(headTag);
+
+		StringBuilder stringBuilder = new StringBuilder(1000);
+		stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+
+		xml.toString(stringBuilder, "");
+
+		return stringBuilder.toString();
 	};
 	
-	private String getXSDType(Type fieldType){
+	private String getXsdType(Type fieldType, HashMap<Package, String> packageToNameSpaveMap, Package defaultPackage)
+	{
 		if (fieldType instanceof Class)
 		{
-			return fieldType.getName();
+			return getClassName((Class) fieldType, packageToNameSpaveMap, defaultPackage);
 		}
 		else if (fieldType instanceof IntegerType)
 		{
@@ -197,7 +251,6 @@ public class TransformerXSD implements ICodeGenerator
 		else if (fieldType instanceof StringType)
 		{
 			return "xs:string";
-			//return "Text";
 		}
 		else if (fieldType instanceof DoubleType)
 		{
@@ -227,24 +280,24 @@ public class TransformerXSD implements ICodeGenerator
 		{
 			return "xs:string";
 		}
-//		else if (fieldType instanceof CollectionType)
-//		{
-//		}
+		// else if (fieldType instanceof CollectionType)
+		// {
+		// }
 		else if (fieldType instanceof DateType)
 		{
 			return "xs:date";
 		}
 		else if (fieldType instanceof ObjectType)
 		{
-//			return "xs:anyType";
+			// return "xs:anyType";
 			return "Object";
 		}
 		else
 		{
-			//return "string";
+			// return "string";
 			throw new NotImplementedException("TransformerXSD.getXSDType():" + fieldType.getClass());
 		}
-	}
+	};
 
 	public static final String DEFAULT_PACKAGE_NAME = "DEFAULT";
 };
