@@ -31,6 +31,7 @@ import eu.atac.atf.test.metadata.SInstanceOf;
 import eu.atac.atf.test.metadata.SVariable;
 import eu.sarunas.atf.generators.tests.RandomGenerator;
 import eu.sarunas.atf.meta.sut.Class;
+import eu.sarunas.atf.meta.sut.Modifier;
 
 import eu.sarunas.atf.meta.sut.Method;
 import eu.sarunas.projects.atf.metadata.generic.Type;
@@ -254,7 +255,7 @@ public class PPattern4 extends ConstrainPatternBase {
 					
 					Class typeClass = ModelUtil.findClass(atfTestModel, type);
 					Class typeRefClass = ModelUtil.findClass(atfTestModel, typeRef);
-					if(typeClass.isAbstract()){
+					if(typeClass.getModifiers().contains(Modifier.Abstract)){
 						List<Class> parrents = ModelUtil.getAllParrents(atfTestModel, typeClass);
 						Class parrent = parrents.get(1);
 						

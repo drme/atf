@@ -178,10 +178,10 @@ public class CodeGeneratorJava implements ICodeGenerator
     		}
     		else
     		{
-    			String result = "";
+    			String result = getTabs(tabs) + "eu.sarunas.junit.TestsHelper.set(" + fieldAsignment.getObject().getObjectName() + ", \"" + fieldAsignment.getField().getName() + "\", " + toString(fieldAsignment.getValue()) + ");\n";
     			
-    			result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").setAccessible(true);\n";
-    			result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").set(" + fieldAsignment.getObject().getObjectName() + ", " + toString(fieldAsignment.getValue()) + ");\n";
+    			//result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").setAccessible(true);\n";
+    			//result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").set(" + fieldAsignment.getObject().getObjectName() + ", " + toString(fieldAsignment.getValue()) + ");\n";
     			
     			return result;
     		}

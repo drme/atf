@@ -1,5 +1,6 @@
 package eu.sarunas.atf.generators.code.junit;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import eu.sarunas.atf.generators.code.ITestTransformer;
 import eu.sarunas.atf.generators.code.TestObjectVariable;
@@ -29,7 +30,7 @@ public class TestTransformerJUnit implements ITestTransformer
 {
 	public Class transformTest(TestSuite testSuite)
 	{
-		Class cl = new Class("Test" + testSuite.getName(), Modifier.PUBLIC, testSuite.getTestCases().get(0).getPackage(), testSuite);
+		Class cl = new Class("Test" + testSuite.getName(), EnumSet.of(Modifier.Public), testSuite.getTestCases().get(0).getPackage(), testSuite);
 
 		int id = 0;
 
@@ -50,7 +51,7 @@ public class TestTransformerJUnit implements ITestTransformer
 
 		cl.addMethod(m);
 
-		ObjectConstruct testObject = new ObjectConstruct(new Class(testCase.getClassName(), Modifier.PUBLIC, testCase.getPackage(), testCase), "testObject");
+		ObjectConstruct testObject = new ObjectConstruct(new Class(testCase.getClassName(), EnumSet.of(Modifier.Public), testCase.getPackage(), testCase), "testObject");
 		
 		m.getImplementation().add(testObject);
 
@@ -260,7 +261,7 @@ public class TestTransformerJUnit implements ITestTransformer
 	
 	private ParameterizedClass createList(TestObjectCollection elementType)
 	{
-		ParameterizedClass cls = new ParameterizedClass(arrayListType, null, 0, arrayListType.getPackage(), null);
+		ParameterizedClass cls = new ParameterizedClass(arrayListType, null, EnumSet.of(Modifier.Public), arrayListType.getPackage(), null);
 		
 		cls.addParameter(((CollectionType)elementType.getType()).getEnclosingType());
 		
@@ -268,5 +269,5 @@ public class TestTransformerJUnit implements ITestTransformer
 	};
 	
 	private int varId = 0;
-	private static final Class arrayListType = new Class("ArrayList", 0, new eu.sarunas.atf.meta.sut.Package(null, "java.util", null), null);
+	private static final Class arrayListType = new Class("ArrayList", EnumSet.of(Modifier.Public), new eu.sarunas.atf.meta.sut.Package(null, "java.util", null), null);
 };

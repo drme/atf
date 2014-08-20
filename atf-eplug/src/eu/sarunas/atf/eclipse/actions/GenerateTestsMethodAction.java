@@ -1,5 +1,12 @@
 package eu.sarunas.atf.eclipse.actions;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
@@ -58,6 +65,8 @@ public class GenerateTestsMethodAction extends BaseAction
 
 				IPath testsFolder = writer.createTestsFolder("tests", project, monitor);
 
+				generateHelperClass(project, testsFolder, monitor);
+				
 				for (TestSuite ts : testProject.getTestSuites())
 				{
 					TestTransformerJUnit trasnformer = new TestTransformerJUnit();
@@ -74,6 +83,23 @@ public class GenerateTestsMethodAction extends BaseAction
 				this.exception = ex;
 			}
 		}
+	};
+	
+	private void generateHelperClass(IJavaProject javaProject, IPath testsFolder, IProgressMonitor monitor) throws UnsupportedEncodingException, IOException, URISyntaxException
+	{
+		EclipseTestsWriter writer = new EclipseTestsWriter();
+
+		String code = "";
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/JUnitTemplate.txt"))))
+		{
+			for (String line; (line = reader.readLine()) != null;)
+			{
+				code += line + "\n";
+			}
+		}
+
+		writer.createTestsFile("eu.sarunas.junit.TestsHelper", code, javaProject, testsFolder, monitor);
 	};
 
 	@Override

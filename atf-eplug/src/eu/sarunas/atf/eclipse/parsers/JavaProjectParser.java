@@ -1,6 +1,7 @@
 package eu.sarunas.atf.eclipse.parsers;
 
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.HashMap;
 import javax.security.auth.callback.LanguageCallback;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -80,7 +81,7 @@ public class JavaProjectParser implements IModelParser
 		
 		for (IPackageFragmentRoot root : source.getPackageFragmentRoots())
 		{
-			if (root.getKind() == IPackageFragmentRoot.K_SOURCE)
+			if ((root.getKind() == IPackageFragmentRoot.K_SOURCE) && (false == root.getElementName().equals("tests")))
 			{
 				for (IJavaElement e : root.getChildren())
 				{
@@ -158,6 +159,8 @@ public class JavaProjectParser implements IModelParser
 		{
 			c.addField(transformField(field, c));
 		}
+		
+		c.getModifiers().addAll(getModifiers(type));
 
 		return c;
 	};
@@ -420,7 +423,9 @@ public class JavaProjectParser implements IModelParser
 
 				String packageName = className.lastIndexOf('.') != -1 ? className.substring(0, className.lastIndexOf('.')) : "";
 				
-				return new ParameterizedClass(genericClass, className, 0, getPackage(packageName, null), null);
+				
+				//TODO: extract modifiers
+				return new ParameterizedClass(genericClass, className, EnumSet.of(Modifier.None), getPackage(packageName, null), null);
 				
 				//TODO: type add parameters
 			}
@@ -526,17 +531,32 @@ public class JavaProjectParser implements IModelParser
 		{
 			if ((null != sourceElement) && (true == sourceElement.isEnum()))
 			{
-				cls = new eu.sarunas.atf.meta.sut.Enum(className, 0, pckge, sourceElement);
+				cls = new eu.sarunas.atf.meta.sut.Enum(className, EnumSet.of(Modifier.None), pckge, sourceElement);
 			}
 			else
 			{
-				cls = new Class(className, 0, pckge, sourceElement);
+				cls = new Class(className, EnumSet.of(Modifier.None), pckge, sourceElement);
 			}
 			
 			pckge.addClass(cls);
 		}
 		
 		return cls;
+	};
+	
+	private EnumSet<Modifier> getModifiers(IType type) throws JavaModelException
+	{
+		EnumSet<Modifier> modifiers = EnumSet.of(Modifier.None);
+
+		if (null != type)
+		{
+			if (true == Flags.isAbstract(type.getFlags()))
+			{
+				modifiers.add(Modifier.Abstract);
+			}
+		}
+
+		return modifiers;
 	};
 	
 	private Project project = null;

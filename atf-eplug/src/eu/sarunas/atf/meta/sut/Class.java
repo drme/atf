@@ -2,40 +2,42 @@ package eu.sarunas.atf.meta.sut;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class Class extends Type
 {
-	public Class(String name, int modifier, Package pckg, Object sourceElement)
-    {
-	    super(name, sourceElement);
-	    this.modifier = modifier;
-	    this.pckg = pckg;
+	public Class(String name, EnumSet<Modifier> modifiers, Package pckg, Object sourceElement)
+	{
+		super(name, sourceElement);
+		this.modifiers = modifiers;
+		this.pckg = pckg;
+		this.referenceType = true;
 
 		assert (false == name.contains("."));
-    };
+	};
 
 	public List<Constructor> getConstructors()
-    {
+	{
 		return Collections.unmodifiableList(this.constructors);
-    };
+	};
 
 	public List<Field> getFields()
-    {
+	{
 		return Collections.unmodifiableList(this.fields);
-    };
+	};
 
 	public List<Method> getMethods()
-    {
-	    return Collections.unmodifiableList(this.methods);
-    };
-    
-    public Package getPackage()
-    {
-    	return this.pckg;
-    };
-	   
+	{
+		return Collections.unmodifiableList(this.methods);
+	};
+
+	public Package getPackage()
+	{
+		return this.pckg;
+	};
+
 	public void addMethod(Method method)
 	{
 		this.methods.add(method);
@@ -50,6 +52,28 @@ public class Class extends Type
 	{
 		this.constructors.add(constructor);
 	};
+	
+	public EnumSet<Modifier> getModifiers()
+	{
+		return this.modifiers;
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public Field getField(String name)
     {
@@ -106,9 +130,7 @@ public class Class extends Type
     
     
     
-    public boolean isAbstract() {
-        return (modifier & AccAbstract) != 0;
-    }
+ 
 
     public boolean isFinal() {
         return (modifier & AccFinal) != 0;
@@ -276,7 +298,6 @@ public class Class extends Type
     public static final int AccVarargs      = 0x0080;
     public static final int AccNative       = 0x0100;
     public static final int AccInterface    = 0x0200;
-    public static final int AccAbstract     = 0x0400;
     public static final int AccStrictfp     = 0x0800;
     public static final int AccSynthetic    = 0x1000;
     public static final int AccAnnotation   = 0x2000;
@@ -284,9 +305,9 @@ public class Class extends Type
     public static final int AccSuper 		= 0x0020;	
 	
     
-    
-    
     private int modifier = -1;
+    
+ 
     private Type superClass;
 
     
@@ -309,4 +330,5 @@ public class Class extends Type
     private List<Constructor> constructors = new ArrayList<Constructor>();
     private List<Method> methods = new ArrayList<Method>();
     private List<Field> fields = new ArrayList<Field>();
+    private EnumSet<Modifier> modifiers = EnumSet.of(Modifier.None);
 };

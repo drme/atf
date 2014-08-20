@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class Package extends Element
 {
@@ -97,6 +98,19 @@ public class Package extends Element
 		return result;
 	};
 
+  public Type findType(String name)
+  {
+  	for (Class c : this.classes.values())
+  	{
+  		if (c.getName().equals(name))
+  		{
+  			return c;
+  		}
+  	}
+  	
+  	return null;
+  };	
+	
 	private Project project = null;
 	private HashMap<String, Class> classes = new HashMap<String, Class>();
 };

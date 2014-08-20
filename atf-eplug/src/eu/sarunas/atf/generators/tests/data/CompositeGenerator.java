@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.xml.datatype.XMLGregorianCalendar;
 import com.mysql.jdbc.log.Log;
 import eu.sarunas.atf.meta.sut.Class;
+import eu.sarunas.atf.meta.sut.Modifier;
 import eu.sarunas.atf.meta.testdata.TestObject;
 import eu.sarunas.atf.meta.testdata.TestObjectComplex;
 import eu.sarunas.atf.meta.testdata.TestObjectField;
@@ -29,6 +30,21 @@ public class CompositeGenerator extends ITypeGenerator
 		
 		List<Class> childClassess = c.getPackage().getProject().findChilds(c);
 		
+		List<Class> classes = new ArrayList<Class>();
+		
+		for (Class clazz : childClassess)
+		{
+			if (false == clazz.getModifiers().contains(Modifier.Abstract))
+			{
+				classes.add(clazz);
+			}
+		}
+
+		if (classes.size() > 0)
+		{
+			childClassess = classes;
+		}
+		
 		if (childClassess.size() > 0)
 		{
 			c = childClassess.get(new Random().nextInt(childClassess.size())); 
@@ -36,7 +52,7 @@ public class CompositeGenerator extends ITypeGenerator
 		
 		
 		TestObjectComplex result = null;
-		if(c.isInterface() || c.isAbstract()){
+		if(c.isInterface() || c.getModifiers().contains(Modifier.Abstract)){
 			//TODO FIX
 			result =  new TestObjectComplex(null, c);
 		}else{

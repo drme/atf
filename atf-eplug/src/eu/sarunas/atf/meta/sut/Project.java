@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import eu.sarunas.projects.atf.metadata.generic.Type;
 
 /**
  * Project class contains all the model of software under test.
@@ -110,6 +111,21 @@ public class Project extends Element
 
     	return result;
     };
-    
+
+	public Type findType(String name)
+	{
+		for (Package packge : this.packages.values())
+		{
+			Type type = packge.findType(name);
+
+			if (null != type)
+			{
+				return type;
+			}
+		}
+
+		return null;
+	};
+
 	private HashMap<String, Package> packages = new HashMap<String, Package>();
 };

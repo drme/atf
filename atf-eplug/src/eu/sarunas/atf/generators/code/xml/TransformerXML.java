@@ -11,6 +11,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.commons.lang.NotImplementedException;
 import eu.sarunas.atf.generators.code.ITestTransformer;
 import eu.sarunas.atf.generators.code.TestObjectVariable;
+import eu.sarunas.atf.generators.code.xsd.TransformerXSD;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.body.ObjectConstruct;
 import eu.sarunas.atf.meta.testdata.TestObject;
@@ -85,12 +86,14 @@ public class TransformerXML implements ITestTransformer
 			name = testDataToValidate.getType().getName();
 		}
 
+		name = TransformerXSD.getNameSpaceName(((Class)testDataToValidate.getType()).getPackage()) + name;
+		
 		XmlElement xml = new XmlElement("HEAD");
 		xml.addParam("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
 
 		if (testDataToValidate.getType() instanceof eu.sarunas.atf.meta.sut.Class)
 		{
-			xml.addParam("xmlns=\"urn:" + packageName.replaceAll("[\\._]", "") + "\""); // Hack for namespace
+			xml.addParam("xmlns=\"urn:" + TransformerXSD.DEFAULT_PACKAGE_NAME   /*packageName.replaceAll("[\\._]", "")*/ + "\""); // Hack for namespace
 		}
 		else
 		{
@@ -340,9 +343,9 @@ public class TransformerXML implements ITestTransformer
 		throw new NotImplementedException("TransformerXML.toString():" + object.getClass() + " value:" + object);
 	};
 
-	public List<String> getAllClasses(TestObject testDataToValidate, String packageName)
+	public List<Class> getAllClasses(TestObject testDataToValidate, String packageName)
 	{
-		List<String> result = new ArrayList<String>();
+		List<Class> result = new ArrayList<Class>();
 
 		if (testDataToValidate instanceof TestObjectCollection)
 		{
@@ -356,7 +359,7 @@ public class TransformerXML implements ITestTransformer
 		return result;
 	};
 
-	private void getCollectionClasses(TestObjectCollection testDataToValidate, String packageName, List<String> classes)
+	private void getCollectionClasses(TestObjectCollection testDataToValidate, String packageName, List<Class> classes)
 	{
 		for (Object element : testDataToValidate.getElements())
 		{
@@ -376,11 +379,11 @@ public class TransformerXML implements ITestTransformer
 		}
 	};
 
-	private void getComplexClasses(TestObjectComplex testDataToValidate, String packageName, List<String> classes)
+	private void getComplexClasses(TestObjectComplex testDataToValidate, String packageName, List<Class> classes)
 	{
-		if (!classes.contains(testDataToValidate.getType().getName()))
+		if (false == classes.contains(testDataToValidate.getType()))
 		{
-			classes.add(testDataToValidate.getType().getName());
+			classes.add((Class)testDataToValidate.getType());
 		}
 
 		for (TestObjectField field : testDataToValidate.getFields())
@@ -409,7 +412,7 @@ public class TransformerXML implements ITestTransformer
 		}
 	};
 
-	private void getObjectClasses(Object testDataToValidate, String packageName, List<String> classes)
+	private void getObjectClasses(Object testDataToValidate, String packageName, List<Class> classes)
 	{
 		if (testDataToValidate == null)
 		{

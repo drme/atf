@@ -9,3 +9,7 @@
 9. interface parsing.
 a. pass IJavaProject to dresden ocl instead of trashy manual xsd.
 b. generate tests for interface methods.
+c. choosing child class on inheritance graph.
+d. strings generator by domain (dictionary).
+e. cancel generation.
+f. use IModel IInstanceModel IMeta model instead of passing data by files? is it 1970s now or what?

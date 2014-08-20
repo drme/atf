@@ -1,13 +1,14 @@
 package eu.sarunas.atf.meta.sut;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Enum extends Class
 {
-	public Enum(String name, int modifier, Package packge, Object sourceElement)
+	public Enum(String name, EnumSet<Modifier> modifiers, Package packge, Object sourceElement)
 	{
-		super(name, modifier, packge, sourceElement);
+		super(name, modifiers, packge, sourceElement);
 	};
 
 	public Set<String> getValues()

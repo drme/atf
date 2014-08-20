@@ -3,6 +3,7 @@ package eu.atac.atf.test.metadata;
 import eu.atac.atf.main.ATFException;
 import eu.atac.atf.main.ModelUtil;
 import eu.sarunas.atf.meta.sut.Class;
+import eu.sarunas.atf.meta.sut.Modifier;
 
 public class SCreateObject extends SValue{
 	
@@ -23,7 +24,7 @@ public class SCreateObject extends SValue{
 		}else{
 			if(ModelUtil.hasDefaultConstructor(type)){
 				s.append(" new ").append(type.getFullName()).append("()");
-				if(type.isAbstract()){
+				if(type.getModifiers().contains(Modifier.Abstract)){
 					s.append("{}");
 				}
 			}else{

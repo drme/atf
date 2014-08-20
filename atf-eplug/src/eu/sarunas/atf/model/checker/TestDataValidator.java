@@ -1,10 +1,8 @@
 package eu.sarunas.atf.model.checker;
 
 import java.io.File;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import tudresden.ocl20.pivot.essentialocl.expressions.impl.ExpressionInOclImpl;
 import tudresden.ocl20.pivot.essentialocl.standardlibrary.OclBoolean;
 import tudresden.ocl20.pivot.interpreter.IInterpretationResult;
@@ -16,6 +14,8 @@ import tudresden.ocl20.pivot.standalone.facade.StandaloneFacade;
 import eu.atac.atf.main.Files;
 import eu.sarunas.atf.generators.code.xml.TransformerXML;
 import eu.sarunas.atf.generators.code.xsd.TransformerXSD;
+import eu.sarunas.atf.generators.model.dresden.ProjectModel;
+import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Package;
 import eu.sarunas.atf.meta.sut.Project;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
@@ -152,19 +152,31 @@ public class TestDataValidator
 
 			
 			TransformerXML transformerXML = new TransformerXML();
-			List<String> classes = transformerXML.getAllClasses(testDataToValidate, packageName);
+			List<Class> classes = transformerXML.getAllClasses(testDataToValidate, packageName);
 			List<String> modelInstances = transformerXML.transformTestObject(testDataToValidate, packageName);
 
-			IModel model = StandaloneFacade.INSTANCE.loadXSDModel(modelFile);
+			List<String> classesNames = new ArrayList<String>();
+			
+			for (Class clss : classes)
+			{
+				classesNames.add(TransformerXSD.getNameSpaceName(clss.getPackage()) + clss.getName());
+			}
+			
+				IModel model = StandaloneFacade.INSTANCE.loadXSDModel(modelFile);
+		//	IModel model = new ProjectModel(project);
+			//IModel model = new JavaModel(project);
 			
 			oclFile = File.createTempFile("ocl", ".ocl");
 
 			// Dresden tool does not support class (context) which has '_' //Hack for namespace
 
 		//	contraints = contraints.replaceFirst(packageName.replaceAll("\\.", "::"), packageName.replaceAll("[\\._]", ""));
+			
+			contraints = patchConstraints(contraints, project);
+			
 			Files.writeToFile(contraints, oclFile);
 
-			return new TestDataValidationResult(validate(oclFile, model, modelInstances, modelFile, classes));
+			return new TestDataValidationResult(validate(oclFile, model, modelInstances, modelFile, classesNames));
 		}
 		finally
 		{
@@ -174,6 +186,67 @@ public class TestDataValidator
 		}
 	};
 
+	private String patchConstraints(String constraints, Project project)
+	{
+		String[] lines = constraints.split("\n");
+		
+		String currentPackage = null;
+		
+		constraints = "";
+		
+		for (String line : lines)
+		{
+			line = line.trim();
+			
+			if (line.startsWith("package "))
+			{
+				currentPackage = line.substring(7).trim();
+			}
+			else if (line.startsWith("endpackage"))
+			{
+				currentPackage = null;
+			}
+			else if (line.startsWith("context "))
+			{
+				if (null != currentPackage)
+				{
+					constraints += "context " + currentPackage + "::" + line.substring(8) + "\n";
+				}
+				else
+				{
+					constraints += line + "\n";
+				}
+			}
+			else
+			{
+				constraints += line + "\n";
+			}
+		}
+		
+		for (Package packge : project.getPackages())
+		{
+			for (Class clss : packge.getClasses())
+			{
+				constraints = constraints.replaceAll(getOclPackageName(packge) + "::" + clss.getName(), TransformerXSD.getNameSpaceName(packge) + clss.getName());
+			}
+		}
+
+		for (Package packge : project.getPackages())
+		{
+			if (packge.getClasses().size() > 0)
+			{
+				constraints = constraints.replaceAll(getOclPackageName(packge), TransformerXSD.getNameSpaceName(packge));
+			}
+		}
+		
+		return constraints;
+	};
+	
+	private String getOclPackageName(Package packge)
+	{
+		return packge.getName().replaceAll("\\.", "::");
+	};
+	
 	private boolean validate(File oclFile, IModel model, List<String> modelInstances, File modelFile, List<String> types) throws InvalidOCLException
 	{
 		File modelInstanceFile = null;

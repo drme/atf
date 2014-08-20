@@ -19,33 +19,39 @@ public class TransformerXSD implements ICodeGenerator
 		return null;
 	};
 
-	private String getNameSpaceName(Package packge)
+	public static String getNameSpaceName(Package packge)
 	{
-		if (packge.getName() == null || packge.getName().trim().length() == 0)
+		if ((null == packge) || (packge.getName() == null) || (packge.getName().trim().length() == 0))
 		{
-			return DEFAULT_PACKAGE_NAME;
+			return "";//DEFAULT_PACKAGE_NAME;
 		}
 		else
 		{
-			return packge.getName().replaceAll("[\\._]", "");
+//			return packge.getName().replaceAll("[\\._]", "");
+//			return packge.getName().replaceAll("[\\.]", ":");
+			String name = packge.getName().replaceAll("[\\.]", "").replaceAll("_", "");
+			
+			return name.substring(0, 1).toUpperCase() + name.substring(1);
 		}
 	};
 	
-	private String getClassName(Class clss, HashMap<Package, String> packageToNameSpaveMap, Package defaultPackage)
+	private String getClassName(Class clss/*, HashMap<Package, String> packageToNameSpaveMap*/, Package defaultPackage)
 	{
-		if (clss.getPackage() == defaultPackage)
+		return getNameSpaceName(clss.getPackage()) + clss.getName();
+		
+/*		if (clss.getPackage() == defaultPackage)
 		{
 			return clss.getName();
 		}
 		else
 		{
 			return packageToNameSpaveMap.get(clss.getPackage()) + ":" + clss.getName();
-		}
+		}*/
 	};
 	
 	public String generateProject(Project project)
 	{
-		Package defaultPackage = project.getPackages().iterator().next();
+		Package defaultPackage = null; /*project.getPackages().iterator().next();
 
 		for (Package packge : project.getPackages())
 		{
@@ -54,12 +60,12 @@ public class TransformerXSD implements ICodeGenerator
 				defaultPackage = packge;
 				break;
 			}
-		}
+		}*/
 
-		String targetNamespace = getNameSpaceName(defaultPackage);
+		String targetNamespace = DEFAULT_PACKAGE_NAME; //getNameSpaceName(defaultPackage);
 
-		HashMap<Package, String> packageToNameSpaveMap = new HashMap<Package, String>();
-		packageToNameSpaveMap.put(defaultPackage, targetNamespace);
+		//HashMap<Package, String> packageToNameSpaveMap = new HashMap<Package, String>();
+		//packageToNameSpaveMap.put(defaultPackage, targetNamespace);
 
 		XmlElement xml = new XmlElement("xs:schema");
 
@@ -68,6 +74,7 @@ public class TransformerXSD implements ICodeGenerator
 		xml.addParam("xmlns=\"urn:" + targetNamespace + "\"");
 		xml.addParam("targetNamespace=\"urn:" + targetNamespace + "\"");
 
+		/*
 		int namespaceId = 0;
 
 		for (Package packge : project.getPackages())
@@ -78,7 +85,7 @@ public class TransformerXSD implements ICodeGenerator
 				packageToNameSpaveMap.put(packge, "ns" + namespaceId);
 				namespaceId++;
 			}
-		}
+		} */
 
 		boolean clsObject = false;
 
@@ -93,14 +100,14 @@ public class TransformerXSD implements ICodeGenerator
 				}
 
 				XmlElement classTag = new XmlElement("xs:complexType");
-				classTag.addParam("name=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
+				classTag.addParam("name=\"" + getClassName(cls /*, packageToNameSpaveMap*/, defaultPackage) + "\"");
 				XmlElement parrentField = classTag;
 
 				if (cls.getSuperClass() != null)
 				{
 					XmlElement complexContentTag = new XmlElement("xs:complexContent");
 					XmlElement extensionTag = new XmlElement("xs:extension");
-					extensionTag.addParam("base=\"" + getClassName((Class) cls.getSuperClass(), packageToNameSpaveMap, defaultPackage) + "\"");// type -> base
+					extensionTag.addParam("base=\"" + getClassName((Class) cls.getSuperClass()/*, packageToNameSpaveMap*/, defaultPackage) + "\"");// type -> base
 					complexContentTag.appendChild(extensionTag);
 					classTag.appendChild(complexContentTag);
 					parrentField = extensionTag;
@@ -155,8 +162,8 @@ public class TransformerXSD implements ICodeGenerator
 								elementMultiTag.addParam(" minOccurs=\"0\" ");
 								elementMultiTag.addParam(" maxOccurs=\"unbounded\" ");
 
-								elementMultiTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
-								rootElementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
+								elementMultiTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType()/*, packageToNameSpaveMap*/, defaultPackage) + "\" ");
+								rootElementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType()/*, packageToNameSpaveMap*/, defaultPackage) + "\" ");
 
 								elementTag.appendChild(elementMultiTag);
 
@@ -164,14 +171,14 @@ public class TransformerXSD implements ICodeGenerator
 							}
 							else
 							{
-								elementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType(), packageToNameSpaveMap, defaultPackage) + "\" ");
+								elementTag.addParam(" type=\"" + getXsdType(ct.getEnclosingType()/*, packageToNameSpaveMap*/, defaultPackage) + "\" ");
 								elementTag.addParam(" minOccurs=\"0\" ");
 								elementTag.addParam(" maxOccurs=\"unbounded\" ");
 							}
 						}
 						else
 						{
-							elementTag.addParam("type=\"" + getXsdType(fieldType, packageToNameSpaveMap, defaultPackage) + "\"");
+							elementTag.addParam("type=\"" + getXsdType(fieldType/*, packageToNameSpaveMap*/, defaultPackage) + "\"");
 						}
 
 						sequenceTag.appendChild(elementTag);
@@ -216,8 +223,8 @@ public class TransformerXSD implements ICodeGenerator
 			for (Class cls : pckg.getClasses())
 			{
 				XmlElement elementTag = new XmlElement("xs:element");
-				elementTag.addParam("name=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
-				elementTag.addParam("type=\"" + getClassName(cls, packageToNameSpaveMap, defaultPackage) + "\"");
+				elementTag.addParam("name=\"" + getClassName(cls/*, packageToNameSpaveMap*/, defaultPackage) + "\"");
+				elementTag.addParam("type=\"" + getClassName(cls/*, packageToNameSpaveMap*/, defaultPackage) + "\"");
 				elementTag.addParam("minOccurs=\"0\"");
 				elementTag.addParam("maxOccurs=\"unbounded\"");
 				sequenceTag.appendChild(elementTag);
@@ -234,11 +241,11 @@ public class TransformerXSD implements ICodeGenerator
 		return stringBuilder.toString();
 	};
 	
-	private String getXsdType(Type fieldType, HashMap<Package, String> packageToNameSpaveMap, Package defaultPackage)
+	private String getXsdType(Type fieldType/*, HashMap<Package, String> packageToNameSpaveMap*/, Package defaultPackage)
 	{
 		if (fieldType instanceof Class)
 		{
-			return getClassName((Class) fieldType, packageToNameSpaveMap, defaultPackage);
+			return getClassName((Class) fieldType/*, packageToNameSpaveMap*/, defaultPackage);
 		}
 		else if (fieldType instanceof IntegerType)
 		{
