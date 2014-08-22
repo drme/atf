@@ -13,3 +13,5 @@ c. choosing child class on inheritance graph.
 d. strings generator by domain (dictionary).
 e. cancel generation.
 f. use IModel IInstanceModel IMeta model instead of passing data by files? is it 1970s now or what?
+g. validate class fields on generation.
+h. constraint solver for generating class field values by adhering to relations between them.

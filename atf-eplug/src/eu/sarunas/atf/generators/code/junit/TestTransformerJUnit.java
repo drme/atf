@@ -10,12 +10,14 @@ import eu.sarunas.atf.meta.sut.Modifier;
 import eu.sarunas.atf.meta.sut.ParameterizedClass;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
 import eu.sarunas.atf.meta.sut.basictypes.VoidType;
+import eu.sarunas.atf.meta.sut.body.ArrayConstruct;
+import eu.sarunas.atf.meta.sut.body.ArrayElementAssignment;
 import eu.sarunas.atf.meta.sut.body.Assert;
 import eu.sarunas.atf.meta.sut.body.FieldAsignment;
+import eu.sarunas.atf.meta.sut.body.LineSeperator;
 import eu.sarunas.atf.meta.sut.body.MethodCall;
 import eu.sarunas.atf.meta.sut.body.MethodCallParameter;
 import eu.sarunas.atf.meta.sut.body.ObjectConstruct;
-import eu.sarunas.atf.meta.testdata.TestObject;
 import eu.sarunas.atf.meta.testdata.TestObjectCollection;
 import eu.sarunas.atf.meta.testdata.TestObjectComplex;
 import eu.sarunas.atf.meta.testdata.TestObjectField;
@@ -42,57 +44,66 @@ public class TestTransformerJUnit implements ITestTransformer
 		return cl;
 	};
 
-	private void transformTestCase(TestCase testCase, Class cl, int id)
+	private String getTestMethodName(Method methodToTest, int id)
+	{
+		String methodName = methodToTest.getName();
+		
+		methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+		
+		return "test" + methodName + id;
+	};
+	
+	private void transformTestCase(TestCase testCase, Class testClass, int id)
 	{
 		Logger.logger.info("Transforming test to JUnit: " + testCase.toString());
-		
-		Method m = new Method(cl, "test" + testCase.getMethod().getName() + id, Modifier.Public, new VoidType(), null);
-		m.getAnnotations().add("org.junit.Test");
 
-		cl.addMethod(m);
+		Method testMethod = new Method(testClass, "test" + getTestMethodName(testCase.getMethod(), id), Modifier.Public, new VoidType(), null);
+		testMethod.getAnnotations().add("org.junit.Test");
+
+		testClass.addMethod(testMethod);
 
 		ObjectConstruct testObject = new ObjectConstruct(new Class(testCase.getClassName(), EnumSet.of(Modifier.Public), testCase.getPackage(), testCase), "testObject");
-		
-		m.getImplementation().add(testObject);
 
-		for (TestInput i : testCase.getInputs())
+		testMethod.getImplementation().add(testObject);
+
+		for (TestInput testInput : testCase.getInputs())
 		{
 			MethodCall call = new MethodCall(testCase.getMethod(), testObject.getObjectName(), testCase.getMethod().getReturnType() instanceof VoidType ? null : "res");
 
 			HashMap<TestInputParameter, ObjectConstruct> preconstructedInputs = new HashMap<TestInputParameter, ObjectConstruct>();
 
-			for (TestInputParameter p : i.getInputParameters())
+			for (TestInputParameter p : testInput.getInputParameters())
 			{
 				if (p.getValue() instanceof TestObjectCollection)
 				{
-					TestObjectCollection collection = (TestObjectCollection)p.getValue();
-					
+					TestObjectCollection collection = (TestObjectCollection) p.getValue();
+
 					switch (collection.getStyle())
 					{
 						case Array:
 							break;
 						case List:
 							ObjectConstruct construct = new ObjectConstruct(createList(collection), p.getName() + varId++);
-							m.getImplementation().add(construct);
-							
+							testMethod.getImplementation().add(construct);
+
 							for (Object value : collection.getElements())
 							{
 								Object v = value;
-								
+
 								if (v instanceof TestObjectComplex)
 								{
-									v = unwapComplexCreation((TestObjectComplex) v, m);
-								}								
-								
+									v = unwapComplexCreation((TestObjectComplex) v, testMethod);
+								}
+
 								MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), construct.getObjectName(), null);
 
 								MethodCallParameter parameter = new MethodCallParameter(null, v);
-								
+
 								addCall.addParameter(parameter);
-								
-								m.getImplementation().add(addCall);
+
+								testMethod.getImplementation().add(addCall);
 							}
-							
+
 							preconstructedInputs.put(p, construct);
 							break;
 						default:
@@ -103,64 +114,72 @@ public class TestTransformerJUnit implements ITestTransformer
 				{
 					ObjectConstruct construct = new ObjectConstruct((Class) p.getParameter().getType(), generateObjectName(p.getParameter().getType()));
 
-					m.getImplementation().add(construct);
+					testMethod.getImplementation().add(construct);
 
 					TestObjectComplex value = (TestObjectComplex) p.getValue();
 
 					for (TestObjectField field : value.getFields())
 					{
-						
 						if (field.getValue() instanceof TestObjectCollection)
 						{
-							
-							
-							TestObjectCollection collection = (TestObjectCollection)field.getValue();
-							
+							TestObjectCollection collection = (TestObjectCollection) field.getValue();
+
 							switch (collection.getStyle())
 							{
 								case Array:
-									break;
-								case List:
-									ObjectConstruct c1 = new ObjectConstruct(createList(collection), field.getField().getName() + varId++);
-									m.getImplementation().add(c1);
-									
+									ArrayConstruct arrayConstruct = new ArrayConstruct(collection.getType(), field.getField().getName() + varId++, collection.getElements().size());
+									testMethod.getImplementation().add(arrayConstruct);
+
+									int index = 0;
+
 									for (Object value1 : collection.getElements())
 									{
 										Object v = value1;
-										
+
 										if (v instanceof TestObjectComplex)
 										{
-											v = unwapComplexCreation((TestObjectComplex) v, m);
+											v = unwapComplexCreation((TestObjectComplex) v, testMethod);
 										}
-										
+
+										testMethod.getImplementation().add(new ArrayElementAssignment(arrayConstruct, index++, v));
+									}
+
+									break;
+								case List:
+									ObjectConstruct c1 = new ObjectConstruct(createList(collection), field.getField().getName() + varId++);
+									testMethod.getImplementation().add(c1);
+
+									for (Object value1 : collection.getElements())
+									{
+										Object v = value1;
+
+										if (v instanceof TestObjectComplex)
+										{
+											v = unwapComplexCreation((TestObjectComplex) v, testMethod);
+										}
+
 										MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), c1.getObjectName(), null);
 
 										MethodCallParameter parameter = new MethodCallParameter(null, v);
-										
+
 										addCall.addParameter(parameter);
-										
-										m.getImplementation().add(addCall);
+
+										testMethod.getImplementation().add(addCall);
 									}
-									
-									m.getImplementation().add(new FieldAsignment(construct, field.getField(), new TestObjectVariable(c1.getObjectName(), c1.getClassToConstruct(), c1)));
-									
+
+									testMethod.getImplementation().add(new FieldAsignment(construct, field.getField(), new TestObjectVariable(c1.getObjectName(), c1.getClassToConstruct(), c1)));
 									break;
 								default:
 									break;
-							}				
-							
-							
-							
-						}						
-						
-						
+							}
+						}
 						else if (field.getValue() instanceof TestObjectComplex)
 						{
-							m.getImplementation().add(new FieldAsignment(construct, field.getField(), unwapComplexCreation((TestObjectComplex)field.getValue(), m)));
+							testMethod.getImplementation().add(new FieldAsignment(construct, field.getField(), unwapComplexCreation((TestObjectComplex) field.getValue(), testMethod)));
 						}
 						else
 						{
-							m.getImplementation().add(new FieldAsignment(construct, field.getField(), field.getValue()));
+							testMethod.getImplementation().add(new FieldAsignment(construct, field.getField(), field.getValue()));
 						}
 					}
 
@@ -168,7 +187,7 @@ public class TestTransformerJUnit implements ITestTransformer
 				}
 			}
 
-			for (TestInputParameter p : i.getInputParameters())
+			for (TestInputParameter p : testInput.getInputParameters())
 			{
 				if (preconstructedInputs.containsKey(p))
 				{
@@ -182,89 +201,86 @@ public class TestTransformerJUnit implements ITestTransformer
 				}
 			}
 
-			m.getImplementation().add(call);
+			testMethod.getImplementation().add(new LineSeperator());
+			testMethod.getImplementation().add(call);
 		}
 
-		m.getImplementation().add(new Assert());
+		testMethod.getImplementation().add(new Assert());
 	};
 	
-	private TestObjectVariable unwapComplexCreation(TestObjectComplex object, Method m)
+	private TestObjectVariable unwapComplexCreation(TestObjectComplex object, Method methodCode)
 	{
-		ObjectConstruct construct = new ObjectConstruct((Class)object.getType(), generateObjectName(object.getType()));
-		
-		m.getImplementation().add(construct);
+		ObjectConstruct construct = new ObjectConstruct((Class) object.getType(), generateObjectName(object.getType()));
+
+		methodCode.getImplementation().add(construct);
 
 		for (TestObjectField field : object.getFields())
 		{
 			if (field.getValue() instanceof TestObjectCollection)
 			{
-				
-				
-				TestObjectCollection collection = (TestObjectCollection)field.getValue();
-				
+				TestObjectCollection collection = (TestObjectCollection) field.getValue();
+
 				switch (collection.getStyle())
 				{
 					case Array:
 						break;
 					case List:
 						ObjectConstruct c1 = new ObjectConstruct(createList(collection), field.getField().getName() + varId++);
-						m.getImplementation().add(c1);
-						
+						methodCode.getImplementation().add(c1);
+
 						for (Object value : collection.getElements())
 						{
 							Object v = value;
-							
+
 							if (v instanceof TestObjectComplex)
 							{
-								v = unwapComplexCreation((TestObjectComplex) v, m);
-							}							
-							
-							
+								v = unwapComplexCreation((TestObjectComplex) v, methodCode);
+							}
+
 							MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), c1.getObjectName(), null);
 
 							MethodCallParameter parameter = new MethodCallParameter(null, v);
-							
+
 							addCall.addParameter(parameter);
-							
-							m.getImplementation().add(addCall);
+
+							methodCode.getImplementation().add(addCall);
 						}
-						
-						m.getImplementation().add(new FieldAsignment(construct, field.getField(), new TestObjectVariable(c1.getObjectName(), c1.getClassToConstruct(), c1)));
-						
+
+						methodCode.getImplementation().add(new FieldAsignment(construct, field.getField(), new TestObjectVariable(c1.getObjectName(), c1.getClassToConstruct(), c1)));
+
 						break;
 					default:
 						break;
-				}				
-				
-				
-				
+				}
 			}
 			else if (field.getValue() instanceof TestObjectComplex)
 			{
-				m.getImplementation().add(new FieldAsignment(construct, field.getField(), unwapComplexCreation((TestObjectComplex)field.getValue(), m)));
+				methodCode.getImplementation().add(new FieldAsignment(construct, field.getField(), unwapComplexCreation((TestObjectComplex) field.getValue(), methodCode)));
 			}
 			else
 			{
-				m.getImplementation().add(new FieldAsignment(construct, field.getField(), field.getValue()));
+				methodCode.getImplementation().add(new FieldAsignment(construct, field.getField(), field.getValue()));
 			}
 		}
-		
+
+		methodCode.getImplementation().add(new LineSeperator());
+
 		return new TestObjectVariable(construct.getObjectName(), construct.getClassToConstruct(), construct);
 	};
 
 	private String generateObjectName(Type type)
 	{
 		String name = type.getName() + (varId++);
-		
+
 		return name.substring(0, 1).toLowerCase() + name.substring(1);
 	};
-	
+
 	private ParameterizedClass createList(TestObjectCollection elementType)
 	{
 		ParameterizedClass cls = new ParameterizedClass(arrayListType, null, EnumSet.of(Modifier.Public), arrayListType.getPackage(), null);
-		
-		cls.addParameter(((CollectionType)elementType.getType()).getEnclosingType());
-		
+
+		cls.addParameter(((CollectionType) elementType.getType()).getEnclosingType());
+
 		return cls;
 	};
 	

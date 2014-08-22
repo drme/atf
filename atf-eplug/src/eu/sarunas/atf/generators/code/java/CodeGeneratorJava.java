@@ -15,9 +15,12 @@ import eu.sarunas.atf.meta.sut.Field;
 import eu.sarunas.atf.meta.sut.Method;
 import eu.sarunas.atf.meta.sut.ParameterizedClass;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
+import eu.sarunas.atf.meta.sut.body.ArrayConstruct;
+import eu.sarunas.atf.meta.sut.body.ArrayElementAssignment;
 import eu.sarunas.atf.meta.sut.body.Assert;
 import eu.sarunas.atf.meta.sut.body.FieldAsignment;
 import eu.sarunas.atf.meta.sut.body.ICodeBodyElement;
+import eu.sarunas.atf.meta.sut.body.LineSeperator;
 import eu.sarunas.atf.meta.sut.body.MethodCall;
 import eu.sarunas.atf.meta.sut.body.MethodCallParameter;
 import eu.sarunas.atf.meta.sut.body.ObjectConstruct;
@@ -28,78 +31,97 @@ import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class CodeGeneratorJava implements ICodeGenerator
 {
-	public String generateClass(Class cl)
-    {
+	public String generateClass(Class clss)
+	{
 		String result = "";
-		
-		if (cl.getPackage().getName().length() > 0)
+
+		if (clss.getPackage().getName().length() > 0)
 		{
-			result += "package " + formatPackageName(cl.getPackage()) + ";\n";
+			result += "package " + formatPackageName(clss.getPackage()) + ";\n";
 		}
-		
-		for (String annotation : cl.getAnnotations())
+
+		for (String annotation : clss.getAnnotations())
 		{
 			result += formatAnnotation(annotation, 0);
 		}
-		
-		result += "public class " + cl.getName() + "\n";
+
+		result += "public class " + clss.getName() + "\n";
 		result += "{\n";
 
-		for (Method method : cl.getMethods())
+		for (Method method : clss.getMethods())
 		{
 			result += generateMethod(method);
 		}
-				
-		result += "};\n";
-		
-		return result;
-    };
 
-	private String generateMethod(Method m)
-    {
+		result += "};\n";
+
+		return result;
+	};
+
+	private String generateMethod(Method method)
+	{
+		ICodeBodyElement lastElement = null;
+
 		String result = "";
-		
-	    for (String annotation : m.getAnnotations())
-	    {
-	    	result += formatAnnotation(annotation, 1);
-	    }
-	    
-	    result += "	public void " + m.getName() + "() throws Throwable\n";
-	    result += "	{\n";
-	    
-	    for (ICodeBodyElement codeElement : m.getImplementation())
-	    {
-	    	if (codeElement instanceof Assert)
-	    	{
-	    		result += formatAssert((Assert)codeElement, 2);
-	    	}
-	    	else if (codeElement instanceof ObjectConstruct)
-	    	{
-	    		result += formatObjectConstruct((ObjectConstruct)codeElement, 2);
-	    	}
-	    	else if (codeElement instanceof MethodCall)
-	    	{
-	    		result += formatMethodCall((MethodCall)codeElement, 2);
-	    	}
-	    	else if (codeElement instanceof FieldAsignment)
-	    	{
-	    		result += formatFieldAssignment((FieldAsignment)codeElement, 2);
-	    	}
-	    	else
-	    	{
-	    		result += formatUnhandledCode(codeElement, 2);
-	    	}				
-	    }
-	    
-	    result += "	};\n";
-	    result += "\n";
-	    return result;
-    };
+
+		for (String annotation : method.getAnnotations())
+		{
+			result += formatAnnotation(annotation, 1);
+		}
+
+		result += "	public void " + method.getName() + "() throws Throwable\n";
+		result += "	{\n";
+
+		for (ICodeBodyElement codeElement : method.getImplementation())
+		{
+			if (codeElement instanceof Assert)
+			{
+				result += formatAssert((Assert) codeElement, 2);
+			}
+			else if (codeElement instanceof ArrayConstruct)
+			{
+				result += formatArrayConstruct((ArrayConstruct) codeElement, 2);
+			}
+			else if (codeElement instanceof ObjectConstruct)
+			{
+				result += formatObjectConstruct((ObjectConstruct) codeElement, 2);
+			}
+			else if (codeElement instanceof MethodCall)
+			{
+				result += formatMethodCall((MethodCall) codeElement, 2);
+			}
+			else if (codeElement instanceof FieldAsignment)
+			{
+				result += formatFieldAssignment((FieldAsignment) codeElement, 2);
+			}
+			else if (codeElement instanceof ArrayElementAssignment)
+			{
+				result += formatArrayElementAssignment((ArrayElementAssignment) codeElement, 2);
+			}
+			else if (codeElement instanceof LineSeperator)
+			{
+				if ((null == lastElement) || (false == (lastElement instanceof LineSeperator)))
+				{
+					result += "\n";
+				}
+			}
+			else
+			{
+				result += formatUnhandledCode(codeElement, 2);
+			}
+
+			lastElement = codeElement;
+		}
+
+		result += "	};\n";
+		result += "\n";
+		return result;
+	};
     
-    private String formatAssert(Assert assrt, int tabs)
-    {
-    	return getTabs(tabs) + "junit.framework.Assert.fail();\n";
-    };
+	private String formatAssert(Assert assrt, int tabs)
+	{
+		return getTabs(tabs) + "junit.framework.Assert.fail();\n";
+	};
     
     private String formatObjectConstruct(ObjectConstruct objectConstruct, int tabs)
     {
@@ -109,6 +131,15 @@ public class CodeGeneratorJava implements ICodeGenerator
     	
     	return result;
     };
+    
+    private String formatArrayConstruct(ArrayConstruct objectConstruct, int tabs)
+    {
+    	String result = getTabs(tabs);
+    	
+   		result += formatTypeName(objectConstruct.getTypeToConstruct()) + "[] " + objectConstruct.getObjectName() + " = new " + formatTypeName(objectConstruct.getTypeToConstruct()) + "[" + objectConstruct.getSize() + "];\n";
+    	
+    	return result;
+    };    
     
     private String formatMethodCall(MethodCall methodCall, int tabs)
     {
@@ -147,6 +178,11 @@ public class CodeGeneratorJava implements ICodeGenerator
     	
 		return result;
     };
+
+	private String formatArrayElementAssignment(ArrayElementAssignment elementAssignment, int tabs)
+	{
+		return getTabs(tabs) + elementAssignment.getArray().getObjectName() + "[" + elementAssignment.getIndex() + "] = " + toString(elementAssignment.getValue()) + ";\n";
+	};
     
     private String formatFieldAssignment(FieldAsignment fieldAsignment, int tabs)
     {
@@ -178,12 +214,7 @@ public class CodeGeneratorJava implements ICodeGenerator
     		}
     		else
     		{
-    			String result = getTabs(tabs) + "eu.sarunas.junit.TestsHelper.set(" + fieldAsignment.getObject().getObjectName() + ", \"" + fieldAsignment.getField().getName() + "\", " + toString(fieldAsignment.getValue()) + ");\n";
-    			
-    			//result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").setAccessible(true);\n";
-    			//result += getTabs(tabs) + fieldAsignment.getObject().getObjectName() + ".getClass().getDeclaredField(\"" + fieldAsignment.getField().getName() + "\").set(" + fieldAsignment.getObject().getObjectName() + ", " + toString(fieldAsignment.getValue()) + ");\n";
-    			
-    			return result;
+    			return getTabs(tabs) + "eu.sarunas.junit.TestsHelper.set(" + fieldAsignment.getObject().getObjectName() + ", \"" + fieldAsignment.getField().getName() + "\", " + toString(fieldAsignment.getValue()) + ");\n";
     		}
     	}
     };
@@ -336,6 +367,19 @@ public class CodeGeneratorJava implements ICodeGenerator
     			return "// NotImplemented by layzy ass developers";
     	}
     };
+    
+    private static String formatTypeName(Type type)
+    {
+    	if (type instanceof Class)
+    	{
+    		return formatClassName((Class)type);
+    	}
+    	else
+    	{
+    		return type.getFullName();
+    	}
+    };
+    
     
 	private static String formatClassName(Class clss)
 	{

@@ -2,6 +2,7 @@ package eu.sarunas.atf.generators.tests.data;
 
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
 import eu.sarunas.atf.meta.testdata.TestObjectCollection;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class CollectionGenerator extends ITypeGenerator
@@ -11,7 +12,7 @@ public class CollectionGenerator extends ITypeGenerator
 		super(randomizer);
 	};
 
-	public Object generate(Type type)
+	public Object generate(Type type, ITestDataValidator validator)
 	{
 		CollectionType collectionType = (CollectionType) type;
 
@@ -21,7 +22,7 @@ public class CollectionGenerator extends ITypeGenerator
 
 		for (int i = 0; i < length; i++)
 		{
-			array.addElement(this.randomizer.getRandomValue(collectionType.getEnclosingType()));
+			array.addElement(this.randomizer.getRandomValue(collectionType.getEnclosingType(), validator));
 		}
 
 		return array;

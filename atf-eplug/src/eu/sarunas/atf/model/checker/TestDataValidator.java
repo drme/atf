@@ -26,16 +26,21 @@ import eu.sarunas.atf.utils.Logger;
 /**
  * Validates if test data matches model and its' constraints.
  */
-public class TestDataValidator
+public class TestDataValidator implements ITestDataValidator
 {
-	/**
-	 * Validates if testDataToValidate objects matches model and model constraints. The validation object is returned that states if data are valid or not. If data are not valid, validation object contains information about failed validation. For example: failed OCL constraint, invalid model type, etc.
-	 * 
-	 * @param model model to validate against to.
-	 * @param contraints model constraints to validate against to.
-	 * @param testDataToValidate test data to validate.
-	 * @return validation result object.
-	 */
+	public TestDataValidator(Project model, String contraints)
+	{
+		this.model = model;
+		this.contraints = contraints;
+	};
+	
+	@Override
+	public TestDataValidationResult validate(TestObject testDataToValidate) throws Exception
+	{
+		return validate(this.model, this.contraints, testDataToValidate);
+	};
+	
+	@Override
 	public TestDataValidationResult validate(Project model, String contraints, TestObject testDataToValidate) throws Exception
 	{
 		TestDataValidationResult result = validateModel(model, testDataToValidate);
@@ -274,7 +279,7 @@ public class TestDataValidator
 
 						//Logger.logger.info("TestDataValidator.validate(): " + result.getConstraint().getSpecification().getBody());
 						//Logger.logger.info("TestDataValidator.validate(): " + oclBoolean.getInvalidReason().getMessage());
-
+/* utter rubbish 
 						boolean exists = false;
 
 						for (String type : types)
@@ -290,7 +295,7 @@ public class TestDataValidator
 						{
 							continue;
 						}
-
+*/
 						if (false == ((OclBoolean) result.getResult()).isTrue())
 						{
 							return false;
@@ -336,5 +341,9 @@ public class TestDataValidator
 			return true;
 		}
 		return false;
-	};
+	}
+
+
+	private Project model = null;
+	private String contraints = null;
 };

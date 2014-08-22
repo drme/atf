@@ -9,6 +9,7 @@ import eu.sarunas.atf.meta.tests.TestInput;
 import eu.sarunas.atf.meta.tests.TestInputParameter;
 import eu.sarunas.atf.meta.tests.TestProject;
 import eu.sarunas.atf.meta.tests.TestSuite;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.atf.model.checker.TestDataValidator;
 import eu.sarunas.atf.utils.Logger;
 
@@ -20,8 +21,6 @@ public class TestsGenerator
 		{
 			public boolean acceptTest(TestCase testCase) throws Exception
 			{
-				TestDataValidator validator = new TestDataValidator();
-
 				for (TestInput input : testCase.getInputs())
 				{
 					for (TestInputParameter parameter : input.getInputParameters())
@@ -30,7 +29,7 @@ public class TestsGenerator
 						{
 							TestObjectComplex data = (TestObjectComplex) parameter.getValue();
 
-							if (false == validator.validate(/*testCase.getMethod().getParent().getPackage().getProject()*/ method.getParent().getPackage().getProject() , constraints, data).isValid())
+							if (false == this.validator.validate(data).isValid())
 							{
 								Logger.logger.info("Discarded: " + data.toString());
 
@@ -40,17 +39,29 @@ public class TestsGenerator
 					}
 				}
 
-				count++;
+				this.count++;
 
 				return true;
 			};
 
 			public boolean isDone()
 			{
-				return count > maxTestsCount;
+				return this.count > maxTestsCount;
 			};
 
+			@Override
+			public ITestDataValidator getValidator()
+			{
+				if (null == this.validator)
+				{
+					this.validator = new TestDataValidator(method.getParent().getPackage().getProject(), constraints);
+				}
+				
+				return this.validator;
+			};
+			
 			private int count = 0;
+			private ITestDataValidator validator = null;
 		}, project);
 	};
 	

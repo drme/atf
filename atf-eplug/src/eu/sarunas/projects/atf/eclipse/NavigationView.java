@@ -176,7 +176,7 @@ class TreeParent extends TreeObject
 			{
 				for (TestSuite ts : ((TestProject)this.tag).getTestSuites())
 				{
-					addChild(new TreeParent(ts.getName()+ "_" + ts.getId(), ts));
+					addChild(new TreeParent(ts.getName()+ "_" + ts.hashCode(), ts));
 				}
 			}
 			else if (this.tag instanceof TestSuite)
@@ -190,7 +190,7 @@ class TreeParent extends TreeObject
 			{
 				for (TestInput ti : ((TestCase)this.tag).getInputs())
 				{
-					addChild(new TreeParent(ti.getTestCase().getMethod() + "_" + ti.getId(), ti));
+					addChild(new TreeParent(ti.getTestCase().getMethod() + "_" + ti.hashCode(), ti));
 				}
 			}
 			else if (this.tag instanceof TestInput)

@@ -51,7 +51,7 @@
 	</classpathentry>
 	<classpathentry excluding="eu/sarunas/atf/generators/model/dresden/JavaAdapterFactory.java|eu/sarunas/atf/generators/model/dresden/JavaClass.java|eu/sarunas/atf/generators/model/dresden/JavaEnumeration.java|eu/sarunas/atf/generators/model/dresden/JavaEnumerationLiteral.java|eu/sarunas/atf/generators/model/dresden/JavaField.java|eu/sarunas/atf/generators/model/dresden/JavaModel.java|eu/sarunas/atf/generators/model/dresden/JavaOperation.java|eu/sarunas/atf/generators/model/dresden/JavaPackage.java|eu/sarunas/atf/generators/model/dresden/JavaParameter.java|eu/sarunas/atf/generators/model/dresden/JavaPrimitiveType.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry kind="src" path="tests"/>
+	<classpathentry excluding="eu/sarunas/projects/atf/metadata/transformers/JavaTransformerTests.java" kind="src" path="tests"/>
 	<classpathentry kind="lib" path="lib/eclipselink.jar"/>
 	<classpathentry kind="lib" path="lib/javax.persistence_1.99.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.2-beta-bin.jar"/>

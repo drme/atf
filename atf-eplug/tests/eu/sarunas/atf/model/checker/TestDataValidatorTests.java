@@ -78,7 +78,7 @@ public class TestDataValidatorTests
 			}
 		}
 		//----------------------------------------------------------------------------------------------------------//
-		TestDataValidator validator = new TestDataValidator();
+		ITestDataValidator validator = new TestDataValidator(null, null);
 		StandaloneFacade.INSTANCE.initialize(TestDataValidatorTests.class.getResource("/log4j.properties"));
 		URL oclURL   = TestDataValidatorTests.class.getResource("/eu/sarunas/atf/model/checker/IppWebservice.ocl");
 		
@@ -256,7 +256,7 @@ public class TestDataValidatorTests
 		StandaloneFacade.INSTANCE.initialize(TestDataValidatorTests.class.getResource("/log4j.properties"));
 		URL oclURL   = TestDataValidatorTests.class.getResource("/eu/sarunas/atf/model/checker/Test1.ocl");
 		
-		TestDataValidator validator = new TestDataValidator();
+		ITestDataValidator validator = new TestDataValidator(null, null);
 
 		Project model = new Project("BasicTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
@@ -282,7 +282,7 @@ public class TestDataValidatorTests
 		StandaloneFacade.INSTANCE.initialize(TestDataValidatorTests.class.getResource("/log4j.properties"));
 		URL oclURL   = TestDataValidatorTests.class.getResource("/eu/sarunas/atf/model/checker/Test1.ocl");
 		
-		TestDataValidator validator = new TestDataValidator();
+		ITestDataValidator validator = new TestDataValidator(null, null);
 
 		Project model = new Project("BasicTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
@@ -308,7 +308,7 @@ public class TestDataValidatorTests
 		StandaloneFacade.INSTANCE.initialize(TestDataValidatorTests.class.getResource("/log4j.properties"));
 		URL oclURL   = TestDataValidatorTests.class.getResource("/eu/sarunas/atf/model/checker/Test2.ocl");
 		
-		TestDataValidator validator = new TestDataValidator();
+		ITestDataValidator validator = new TestDataValidator(null, null);
 
 		Project model = new Project("ComplexTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
@@ -346,7 +346,7 @@ public class TestDataValidatorTests
 		StandaloneFacade.INSTANCE.initialize(TestDataValidatorTests.class.getResource("/log4j.properties"));
 		URL oclURL   = TestDataValidatorTests.class.getResource("/eu/sarunas/atf/model/checker/Test2.ocl");
 		
-		TestDataValidator validator = new TestDataValidator();
+		ITestDataValidator validator = new TestDataValidator(null, null);
 
 		Project model = new Project("ComplexTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);

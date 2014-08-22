@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import eu.sarunas.atf.meta.sut.basictypes.DateType;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class DateGenerator extends ITypeGenerator
@@ -14,7 +15,7 @@ public class DateGenerator extends ITypeGenerator
 		super(randomizer);
 	};
 
-	public Object generate(Type type)
+	public Object generate(Type type, ITestDataValidator validator)
 	{
 		DateType dateType = (DateType)type;
 		

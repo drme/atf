@@ -14,6 +14,7 @@ import eu.sarunas.atf.meta.sut.basictypes.LongType;
 import eu.sarunas.atf.meta.sut.basictypes.ObjectType;
 import eu.sarunas.atf.meta.sut.basictypes.ShortType;
 import eu.sarunas.atf.meta.sut.basictypes.StringType;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 /**
@@ -38,23 +39,23 @@ public class Randomizer
 		this.generators.put(DateType.class, new DateGenerator(this));
 	};
 
-	public Object getRandomValue(Type type)
+	public Object getRandomValue(Type type, ITestDataValidator validator)
 	{
 		ITypeGenerator generator = this.generators.get(type.getClass());
 
 		if (null != generator)
 		{
-			return generator.generate(type);
+			return generator.generate(type, validator);
 		}
 
 		if (type instanceof eu.sarunas.atf.meta.sut.Enum)
 		{
-			return this.enumGenerator.generate(type);
+			return this.enumGenerator.generate(type, validator);
 		}
 		
 		if (type instanceof eu.sarunas.atf.meta.sut.Class)
 		{
-			return this.compositeGenerator.generate(type);
+			return this.compositeGenerator.generate(type, validator);
 		}
 
 		return null;

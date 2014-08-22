@@ -14,6 +14,7 @@ import eu.sarunas.atf.meta.testdata.TestObject;
 import eu.sarunas.atf.meta.testdata.TestObjectComplex;
 import eu.sarunas.atf.meta.testdata.TestObjectField;
 import eu.sarunas.atf.meta.testdata.TestObjectSimple;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.atf.utils.Logger;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
@@ -24,11 +25,39 @@ public class CompositeGenerator extends ITypeGenerator
 		super(randomizer);
 	};
 
-	public Object generate(Type type)
+	public Object generate(Type type, ITestDataValidator validator)
 	{
-		Class c = (Class) type;
-		
-		List<Class> childClassess = c.getPackage().getProject().findChilds(c);
+		Class clss = (Class) type;
+
+		for (int i = 0; i < generationRetryCount; i++)
+		{
+			try
+			{
+				TestObjectComplex result = generateClass(clss, validator);
+
+				if (true == validator.validate(result).isValid())
+				{
+					return result;
+				}
+				else
+				{
+					Logger.logger.info("Discarded : " + result);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.log(ex);
+			}
+		}
+
+		Logger.logger.info("Failded to generate, returning null for : " + clss.getFullName());
+
+		return null;
+	};
+
+	private TestObjectComplex generateClass(Class clss, ITestDataValidator validator)
+	{
+		List<Class> childClassess = clss.getPackage().getProject().findChilds(clss);
 		
 		List<Class> classes = new ArrayList<Class>();
 		
@@ -47,19 +76,19 @@ public class CompositeGenerator extends ITypeGenerator
 		
 		if (childClassess.size() > 0)
 		{
-			c = childClassess.get(new Random().nextInt(childClassess.size())); 
+			clss = childClassess.get(new Random().nextInt(childClassess.size())); 
 		}
 		
 		
 		TestObjectComplex result = null;
-		if(c.isInterface() || c.getModifiers().contains(Modifier.Abstract)){
+		if(clss.isInterface() || clss.getModifiers().contains(Modifier.Abstract)){
 			//TODO FIX
-			result =  new TestObjectComplex(null, c);
+			result =  new TestObjectComplex(null, clss);
 		}else{
-			result =  new TestObjectComplex(null, c);
+			result =  new TestObjectComplex(null, clss);
 		}
 
-		generateFieldsValues(c, result, new ArrayList<Class>());
+		generateFieldsValues(clss, result, new ArrayList<Class>(), validator);
 		
 		
 		/*
@@ -91,9 +120,9 @@ public class CompositeGenerator extends ITypeGenerator
 		return null;
 */
 		return result;
-	}
+	};
 
-	private void generateFieldsValues(Class c, TestObjectComplex result, List<Class> generatedTypes)
+	private void generateFieldsValues(Class c, TestObjectComplex result, List<Class> generatedTypes, ITestDataValidator validator)
     {
 	//	Logger.logger.info("Generating for: "+ c.getFullName());
 		
@@ -108,12 +137,12 @@ public class CompositeGenerator extends ITypeGenerator
 		    	if (false == generatedTypes.contains((Class)type))
 		    	{
 		    		generatedTypes.add((Class)field.getType());
-		    		value = this.randomizer.getRandomValue(field.getType());
+		    		value = this.randomizer.getRandomValue(field.getType(), validator);
 		    	}
 	    	}
 	    	else
 	    	{
-	    		value = this.randomizer.getRandomValue(field.getType());
+	    		value = this.randomizer.getRandomValue(field.getType(), validator);
 	    	}
 	    	
 			if (value instanceof TestObject)
@@ -183,7 +212,9 @@ public class CompositeGenerator extends ITypeGenerator
 	    
 	    if (null != c.getSuperClass())
 	    {
-	    	generateFieldsValues((Class) c.getSuperClass(), result, generatedTypes);
+	    	generateFieldsValues((Class) c.getSuperClass(), result, generatedTypes, validator);
 	    }
-    };
+    }
+	
+	private static final int generationRetryCount = 1000;
 };

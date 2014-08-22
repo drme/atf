@@ -14,6 +14,7 @@ import eu.sarunas.atf.meta.tests.TestInput;
 import eu.sarunas.atf.meta.tests.TestInputParameter;
 import eu.sarunas.atf.meta.tests.TestProject;
 import eu.sarunas.atf.meta.tests.TestSuite;
+import eu.sarunas.atf.model.checker.ITestDataValidator;
 import eu.sarunas.atf.utils.Logger;
 import eu.sarunas.projects.atf.generators.value.RVBigDecimal;
 import eu.sarunas.projects.atf.metadata.generic.Type;
@@ -33,7 +34,7 @@ public class RandomGenerator implements ITestGenerator
 
 		while (false == manager.isDone())
 		{
-			TestCase testCase = generateTestCase(method, tests);
+			TestCase testCase = generateTestCase(method, tests, manager.getValidator());
 
 			if (true == manager.acceptTest(testCase))
 			{
@@ -44,7 +45,7 @@ public class RandomGenerator implements ITestGenerator
 		return tests;
 	};
 
-	private TestCase generateTestCase(Method method, TestSuite testSuite)
+	private TestCase generateTestCase(Method method, TestSuite testSuite, ITestDataValidator validator)
 	{
 		TestCase testCase = new TestCase(method, testSuite);
 		List<Parameter> parameters = method.getParameters();
@@ -52,7 +53,7 @@ public class RandomGenerator implements ITestGenerator
 
 		for (int i = 0; i < parameters.size(); i++)
 		{
-			testInput.addParameter(new TestInputParameter(parameters.get(i), this.randomizer.getRandomValue(parameters.get(i).getType())));
+			testInput.addParameter(new TestInputParameter(parameters.get(i), this.randomizer.getRandomValue(parameters.get(i).getType(), validator)));
 		}
 
 		testCase.addInput(testInput);
