@@ -1,4 +1,5 @@
 <project name="atf-lib" default="dist" basedir=".">
+
 	<description>atf library</description>
 
 	<property name="src" location="src"/>
@@ -8,42 +9,127 @@
 
 	<target name="init">
 		<tstamp/>
+		<delete dir="${build}"/>
 		<mkdir dir="${build}"/>
 	</target>
 
 	<target name="compile" depends="init" description="compile the source " >
+
+	<!-- unzip dest="${build}">
+			<fileset dir="lib">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="plugins">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="D:/temp/devel/eclipse/plugins/">
+				<include name="**/*.jar"/>
+			</fileset>
+	    </unzip -->
+
+
 		<javac srcdir="${src}" destdir="${build}" debug="on">
 			<classpath>
 				<pathelement path="${classpath}"/>
 				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+				<fileset dir="plugins">
+					<include name="*.jar"/>
+				</fileset>
+				<fileset dir="D:/temp/devel/eclipse/plugins/">
 					<include name="**/*.jar"/>
 				</fileset>
 			</classpath>
 		</javac>
+
+
+
+  <copy todir="${build}">
+    <fileset dir="resources" excludes="**/*.jar"/>
+  </copy>
+
 	</target>
 
 	<target name="dist" depends="compile" description="generate the distribution" >
-		<!-- Create the distribution directory -->
+
+
+
 		<mkdir dir="${dist}/lib"/>
-		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+
+  <copy todir="./resources/" flatten="true">
+
+			<fileset dir="./">
+
+	<include name="plugins/org.emftext.access_1.2.0.201009131109.jar"/>
+	<include name="plugins/org.emftext.commons.antlr3_2_0_1.0.0.jar"/>
+	<include name="plugins/org.kiama.attribution_3.1.0.201101171054.jar"/>
+	<include name="plugins/scala-library.jar"/>
+	<include name="plugins/tudresden.ocl20.logging_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.essentialocl_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.examples.simple_3.1.0.201101171055.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.interpreter_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.language.ocl.resource.ocl_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.language.ocl.semantics_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.language.ocl.staticsemantics_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.language.ocl_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.metamodels.ecore_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.metamodels.java_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.metamodels.uml2_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.metamodels.xsd_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.model_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.modelinstance_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.modelinstancetype.ecore_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.modelinstancetype.java_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.modelinstancetype.xml_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.modelinstancetype_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.parser_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.pivotmodel.semantics_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.pivotmodel_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.standardlibrary.java_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.codegen.declarativ.ocl2sql_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.codegen.declarativ_3.0.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.codegen.ocl2java.types_3.0.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.codegen.ocl2java_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.codegen_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.CWM_3.0.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.template.sql_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.template_3.1.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar"/>
+	<include name="plugins/tudresden.ocl20.pivot.tools.transformation_3.1.0.201101171054.jar"/>
+	<include name="lib/old_libs/org.eclipse.emf.ecore_2.6.0.v20100614-1136.jar"/>
+	<include name="lib/old_libs/org.eclipse.emf.common_2.6.0.v20100614-1136.jar"/>
+	<include name="lib/old_libs/org.eclipse.core.runtime_3.6.0.v20100505.jar"/>
+	<include name="lib/old_libs/org.eclipse.osgi_3.6.0.v20100517.jar"/>
+	<include name="lib/old_libs/org.eclipse.equinox.common_3.6.0.v20100503.jar"/>
+	<include name="lib/old_libs/org.apache.log4j_1.2.13.v200903072027.jar"/>
+	<include name="lib/old_libs/org.apache.commons.lang_2.3.0.v200803061910.jar"/>
+	<include name="lib/old_libs/org.eclipse.emf.ecore.xmi_2.5.0.v20100521-1846.jar"/>
+
+
+			</fileset>
+
+  </copy>
+
+
+
+		<delete dir="${build}/META-INF/"/>
+
 		<jar jarfile="${output_jar}" basedir="${build}"/>
 
-		<copy file="${output_jar}" tofile="${dist}/lib/atf-lib-${DSTAMP}.jar"/>
-		<copy file="${output_jar}" tofile="../atf-eplug/lib/atf-lib.jar"/>
+		<copy file="${output_jar}" tofile="./resources/tests-runner-helper.jar"/>
 
 		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+
 	</target>
 
 	<target name="clean" description="clean up" >
 		<!-- Delete the ${build} and ${dist} directory trees -->
 		<delete dir="${build}"/>
 		<delete dir="${dist}"/>
-	</target>
-	
-	<target name="EtacPlugUpBin" >
-		<delete dir="C:/Etac/ws/atf/atf\trunk/AtfEclipsePlugin/bin/eu/sarunas"></delete>
-		<copydir dest="C:/Etac/ws/atf/atf\trunk/AtfEclipsePlugin/bin/eu/sarunas" 
-			src="C:/Etac/ws/atf/atf/trunk/AtfEtac/bin/eu/sarunas"></copydir>
 	</target>
 
 </project>

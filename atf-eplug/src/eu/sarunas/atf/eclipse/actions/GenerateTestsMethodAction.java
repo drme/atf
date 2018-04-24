@@ -7,10 +7,23 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.compiler.lookup.MissingTypeBinding;
+import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jface.dialogs.MessageDialog;
 import eu.sarunas.atf.eclipse.generators.EclipseTestsWriter;
 import eu.sarunas.atf.eclipse.parsers.JavaProjectParser;
@@ -41,7 +54,7 @@ public class GenerateTestsMethodAction extends BaseAction
 			JavaProjectParser parser = new JavaProjectParser();
 			Project sutModel = parser.parseProject(project);
 
-			Logger.logger.info(sutModel.toString());
+//		Logger.logger.info(sutModel.toString());
 
 			eu.sarunas.atf.generators.tests.TestsGenerator testsGenerator = new eu.sarunas.atf.generators.tests.TestsGenerator();
 
@@ -52,9 +65,10 @@ public class GenerateTestsMethodAction extends BaseAction
 
 			try
 			{
-				String constriants = ProjectManager.getConstraints(project);
-
-				eu.sarunas.atf.meta.tests.TestSuite testSuite = testsGenerator.generate(methodToTest, testProject, constriants);
+				List<String> constraintsFiles = ProjectManager.getConstraintsFiles(project);
+				
+				
+				eu.sarunas.atf.meta.tests.TestSuite testSuite = testsGenerator.generate(methodToTest, testProject, ProjectManager.getConstraints(project));
 				testProject.getTestSuites().add(testSuite);
 
 				Logger.logger.info(testSuite.toString());
@@ -66,11 +80,60 @@ public class GenerateTestsMethodAction extends BaseAction
 				IPath testsFolder = writer.createTestsFolder("tests", project, monitor);
 
 				generateHelperClass(project, testsFolder, monitor);
+				addHelperLibrary(project, monitor);
+				addHelperFiles(project, monitor);
+				
+				addHelperLibrary(project, monitor, "org.emftext.access_1.2.0.201009131109.jar");
+				addHelperLibrary(project, monitor, "org.emftext.commons.antlr3_2_0_1.0.0.jar");
+				addHelperLibrary(project, monitor, "org.kiama.attribution_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "scala-library.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.logging_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.essentialocl_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.examples.simple_3.1.0.201101171055.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.interpreter_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.language.ocl.resource.ocl_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.language.ocl.semantics_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.language.ocl.staticsemantics_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.language.ocl_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.metamodels.ecore_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.metamodels.java_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.metamodels.uml2_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.metamodels.xsd_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.model_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.modelinstance_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.modelinstancetype.ecore_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.modelinstancetype.java_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.modelinstancetype.xml_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.modelinstancetype_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.parser_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.pivotmodel.semantics_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.pivotmodel_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.standardlibrary.java_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.codegen.declarativ.ocl2sql_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.codegen.declarativ_3.0.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.codegen.ocl2java.types_3.0.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.codegen.ocl2java_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.codegen_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.CWM_3.0.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.template.sql_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.template_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.transformation.pivot2sql_3.0.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "tudresden.ocl20.pivot.tools.transformation_3.1.0.201101171054.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.emf.ecore_2.6.0.v20100614-1136.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.emf.common_2.6.0.v20100614-1136.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.core.runtime_3.6.0.v20100505.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.osgi_3.6.0.v20100517.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.equinox.common_3.6.0.v20100503.jar");
+				addHelperLibrary(project, monitor, "org.apache.log4j_1.2.13.v200903072027.jar");
+				addHelperLibrary(project, monitor, "org.apache.commons.lang_2.3.0.v200803061910.jar");
+				addHelperLibrary(project, monitor, "org.eclipse.emf.ecore.xmi_2.5.0.v20100521-1846.jar");
 				
 				for (TestSuite ts : testProject.getTestSuites())
 				{
 					TestTransformerJUnit trasnformer = new TestTransformerJUnit();
-					eu.sarunas.atf.meta.sut.Class cl = trasnformer.transformTest(ts);
+					eu.sarunas.atf.meta.sut.Class cl = trasnformer.transformTest(ts, constraintsFiles);
 
 					CodeGeneratorJava cdgj = new CodeGeneratorJava();
 					String code = cdgj.generateClass(cl);
@@ -102,6 +165,126 @@ public class GenerateTestsMethodAction extends BaseAction
 		writer.createTestsFile("eu.sarunas.junit.TestsHelper", code, javaProject, testsFolder, monitor);
 	};
 
+	private void addHelperLibrary(IJavaProject javaProject, IProgressMonitor monitor) throws UnsupportedEncodingException, IOException, URISyntaxException, CoreException
+	{
+		IFolder folder = javaProject.getProject().getFolder("tests_lib");
+
+		if (false == folder.exists())
+		{
+			folder.create(IResource.NONE, true, monitor);
+		}
+
+		IFile file = folder.getFile("tests-runner-helper.jar");
+
+		if (file.exists())
+		{
+			file.delete(true, monitor);
+		}
+
+		file.create(this.getClass().getResourceAsStream("/tests-runner-helper.jar"), IResource.NONE, monitor);
+
+		IClasspathEntry jUnitEntry = JavaCore.newContainerEntry(JUnitCore.JUNIT4_CONTAINER_PATH);
+
+		IClasspathEntry[] currentEntries = javaProject.getRawClasspath();
+
+		boolean hasRunner = false;
+		boolean hasJUnit = false;
+
+		for (IClasspathEntry entry : currentEntries)
+		{
+			if (true == entry.getPath().equals(file.getFullPath()))
+			{
+				hasRunner = true;
+			}
+			else if (true == entry.getPath().equals(jUnitEntry.getPath()))
+			{
+				hasJUnit = true;
+			}
+		}
+
+		if ((false == hasJUnit) || (false == hasRunner))
+		{
+			List<IClasspathEntry> newEntries = new ArrayList<>();
+			Collections.addAll(newEntries, currentEntries);
+
+			if (false == hasRunner)
+			{
+				newEntries.add(JavaCore.newLibraryEntry(file.getFullPath(), null, null));
+			}
+
+			if (false == hasJUnit)
+			{
+				newEntries.add(jUnitEntry);
+			}
+
+			javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[0]), monitor);
+		}
+	};
+	
+	private void addHelperLibrary(IJavaProject javaProject, IProgressMonitor monitor, String libraryName) throws UnsupportedEncodingException, IOException, URISyntaxException, CoreException
+	{
+		IFolder folder = javaProject.getProject().getFolder("tests_lib");
+
+		if (false == folder.exists())
+		{
+			folder.create(IResource.NONE, true, monitor);
+		}
+
+		IFile file = folder.getFile(libraryName);
+
+		if (file.exists())
+		{
+			file.delete(true, monitor);
+		}
+
+		file.create(this.getClass().getResourceAsStream("/" + libraryName), IResource.NONE, monitor);
+
+		IClasspathEntry[] currentEntries = javaProject.getRawClasspath();
+
+		boolean hasLibrary = false;
+
+		for (IClasspathEntry entry : currentEntries)
+		{
+			if (true == entry.getPath().equals(file.getFullPath()))
+			{
+				hasLibrary = true;
+				break;
+			}
+		}
+
+		if (false == hasLibrary)
+		{
+			List<IClasspathEntry> newEntries = new ArrayList<>();
+			Collections.addAll(newEntries, currentEntries);
+
+			newEntries.add(JavaCore.newLibraryEntry(file.getFullPath(), null, null));
+
+			javaProject.setRawClasspath(newEntries.toArray(new IClasspathEntry[0]), monitor);
+		}
+	};	
+	
+	private void addHelperFiles(IJavaProject javaProject, IProgressMonitor monitor) throws UnsupportedEncodingException, IOException, URISyntaxException, CoreException
+	{
+		/*
+//		IFolder folder = javaProject.getProject().getFolder(javaProject.getProject().getLocation());		
+
+		IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(javaProject.getProject().getLocation());
+		
+		if (false == folder.exists())
+		{
+	    folder.create(IResource.NONE, true, monitor);
+		}		
+		
+		IFile file = folder.getFile("temp.types");
+		
+		if (file.exists())
+		{
+			file.delete(true, monitor);
+		}
+		
+		file.create(this.getClass().getResourceAsStream("/temp.types"), IResource.NONE, monitor);*/
+	};		
+	
 	@Override
 	protected void onDone()
 	{

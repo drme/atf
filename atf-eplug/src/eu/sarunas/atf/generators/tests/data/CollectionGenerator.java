@@ -28,5 +28,5 @@ public class CollectionGenerator extends ITypeGenerator
 		return array;
 	};
 
-	private int maxLength = 2;
+	private int maxLength = 20;
 };

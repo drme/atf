@@ -24,7 +24,7 @@ import eu.sarunas.atf.utils.Logger;
 
 public class TransformerXML implements ITestTransformer
 {
-	public Class transformTest(TestSuite testSuite)
+	public Class transformTest(TestSuite testSuite, List<String> constraints)
 	{
 		return null;
 	};
@@ -89,7 +89,7 @@ public class TransformerXML implements ITestTransformer
 		name = TransformerXSD.getNameSpaceName(((Class)testDataToValidate.getType()).getPackage()) + name;
 		
 		XmlElement xml = new XmlElement("HEAD");
-		xml.addParam("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+//	xml.addParam("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
 
 		if (testDataToValidate.getType() instanceof eu.sarunas.atf.meta.sut.Class)
 		{
@@ -105,6 +105,9 @@ public class TransformerXML implements ITestTransformer
 		XmlElement child = new XmlElement(name);
 		xml.appendChild(child);
 
+child.addParam("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+		
+		
 		if (testDataToValidate instanceof TestObjectCollection)
 		{
 			throw new NotImplementedException(testDataToValidate.getClass().getName());
@@ -119,8 +122,9 @@ public class TransformerXML implements ITestTransformer
 		}
 
 		StringBuilder stringBuilder = new StringBuilder(500);
-		stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		xml.toString(stringBuilder, "");
+		stringBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+//		xml.toString(stringBuilder, "");
+		child.toString(stringBuilder, "");
 
 		return stringBuilder.toString();
 	};

@@ -5,7 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.essentialocl.standardlibrary_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.examples.pml_3.1.0.201101171055.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.examples.simple_3.1.0.201101171055.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.interpreter_3.1.0.201101171054.jar"/>
+	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.interpreter_3.1.0.201101171054.jar" sourcepath="D:/Downloads/dresdenocl-develop.zip"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl.resource.ocl_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.language.ocl.semantics_3.1.0.201101171054.jar"/>
@@ -18,7 +18,6 @@
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstance_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.ecore_3.1.0.201101171054.jar"/>
-	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.java_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.xml_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.parser_3.1.0.201101171054.jar"/>
 	<classpathentry exported="true" kind="lib" path="plugins/tudresden.ocl20.pivot.pivotmodel_3.1.0.201101171054.jar"/>
@@ -49,7 +48,7 @@
 			<accessrule kind="accessible" pattern="**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry excluding="eu/sarunas/atf/generators/model/dresden/JavaAdapterFactory.java|eu/sarunas/atf/generators/model/dresden/JavaClass.java|eu/sarunas/atf/generators/model/dresden/JavaEnumeration.java|eu/sarunas/atf/generators/model/dresden/JavaEnumerationLiteral.java|eu/sarunas/atf/generators/model/dresden/JavaField.java|eu/sarunas/atf/generators/model/dresden/JavaModel.java|eu/sarunas/atf/generators/model/dresden/JavaOperation.java|eu/sarunas/atf/generators/model/dresden/JavaPackage.java|eu/sarunas/atf/generators/model/dresden/JavaParameter.java|eu/sarunas/atf/generators/model/dresden/JavaPrimitiveType.java" kind="src" path="src"/>
+	<classpathentry excluding="eu/sarunas/atf/generators/model/dresden/JavaAdapterFactory.java|eu/sarunas/atf/generators/model/dresden/JavaClass.java|eu/sarunas/atf/generators/model/dresden/JavaEnumeration.java|eu/sarunas/atf/generators/model/dresden/JavaEnumerationLiteral.java|eu/sarunas/atf/generators/model/dresden/JavaField.java|eu/sarunas/atf/generators/model/dresden/JavaModel.java|eu/sarunas/atf/generators/model/dresden/JavaPackage.java|eu/sarunas/atf/generators/model/dresden/JavaParameter.java|eu/sarunas/atf/generators/model/dresden/JavaPrimitiveType.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry excluding="eu/sarunas/projects/atf/metadata/transformers/JavaTransformerTests.java" kind="src" path="tests"/>
 	<classpathentry kind="lib" path="lib/eclipselink.jar"/>
@@ -57,5 +56,6 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.2-beta-bin.jar"/>
 	<classpathentry kind="lib" path="lib/org.apache.commons.lang_2.3.0.v200803061910.jar"/>
 	<classpathentry kind="lib" path="lib/persistence.jar"/>
+	<classpathentry kind="lib" path="plugins/tudresden.ocl20.pivot.modelinstancetype.java_3.1.0.201101171054.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

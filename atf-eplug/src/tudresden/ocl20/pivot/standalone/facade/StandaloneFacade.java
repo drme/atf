@@ -2,8 +2,12 @@ package tudresden.ocl20.pivot.standalone.facade;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,10 +42,12 @@ import tudresden.ocl20.pivot.modelinstance.IModelInstance;
 import tudresden.ocl20.pivot.modelinstance.IModelInstanceProvider;
 import tudresden.ocl20.pivot.modelinstancetype.ecore.internal.provider.EcoreModelInstanceProvider;
 import tudresden.ocl20.pivot.modelinstancetype.java.internal.provider.JavaModelInstanceProvider;
+import tudresden.ocl20.pivot.modelinstancetype.types.IModelInstanceElement;
 import tudresden.ocl20.pivot.modelinstancetype.types.IModelInstanceObject;
 import tudresden.ocl20.pivot.modelinstancetype.xml.internal.provider.XmlModelInstanceProvider;
 import tudresden.ocl20.pivot.parser.ParseException;
 import tudresden.ocl20.pivot.pivotmodel.Constraint;
+import tudresden.ocl20.pivot.pivotmodel.Operation;
 import tudresden.ocl20.pivot.tools.codegen.declarativ.IOcl2DeclSettings;
 import tudresden.ocl20.pivot.tools.codegen.declarativ.ocl2sql.IOcl2Sql;
 import tudresden.ocl20.pivot.tools.codegen.declarativ.ocl2sql.Ocl2SQLFactory;
@@ -148,8 +154,9 @@ public class StandaloneFacade {
 	 *            the {@link URL} of log4j.properties or <code>null</code> if
 	 *            you don't want to log
 	 * @throws TemplateException
+	 * @throws IOException 
 	 */
-	public void initialize(URL loggerPropertiesUrl) throws TemplateException {
+	public void initialize(URL loggerPropertiesUrl) throws TemplateException, IOException {
 
 		if (!initialized) {
 			/*
@@ -200,6 +207,32 @@ public class StandaloneFacade {
 					.setOclReferenceResolveHelper(new OclReferenceResolveHelper());
 
 			initialized = true;
+			
+			
+			
+			
+			URI uri = URI.createFileURI("temp.types");
+			
+			
+			String fileName = uri.toFileString();
+			
+			FileOutputStream r = new FileOutputStream(fileName);
+			
+			InputStream i = getClass().getResourceAsStream("/temp.types");
+			
+			 copy(i, r);
+			 
+			 r.close();
+			
+			
+		
+			
+			
+			
+			
+			
+			
+			
 		}
 	}
 
@@ -359,18 +392,183 @@ public class StandaloneFacade {
 	public List<Constraint> parseOclConstraints(IModel model, File oclFile)
 			throws IOException, ParseException {
 
+		
+		URI uri = URI.createFileURI("temp.types");
+		
+		
+		String fileName = uri.toFileString();
+		
+		FileOutputStream r = new FileOutputStream(fileName);
+		
+		InputStream i = getClass().getResourceAsStream("/temp.types");
+		
+		 copy(i, r);
+		 
+		 r.close();
+		
+		
 		if (!oclFile.exists())
 			throw new FileNotFoundException("Cannot find file "
 					+ oclFile.getCanonicalPath() + ".");
+		
+		
+
+		
 		return Ocl22Parser.INSTANCE.doParse(model,
 				URI.createFileURI(oclFile.getCanonicalPath()));
 	}
+	
+	
+	
+	
+	public static List<IInterpretationResult> interpretPreConditions(
+			IModelInstance modelInstance,
+			IModelInstanceElement modelInstanceElement, Operation operation,
+			List<IModelInstanceElement> parameters,
+			Collection<Constraint> preConditions)
+			throws IllegalArgumentException {
+
+		if (modelInstance == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'modelInstance' must not be null.");
+		}
+
+		else if (modelInstanceElement == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'modelInstanceElement' must not be null.");
+		}
+
+		else if (operation == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'operation' must not be null.");
+		}
+
+		else if (parameters == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'parameters' must not be null.");
+		}
+
+		else if (preConditions == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'preConditions' must not be null.");
+		}
+		// no else.
+
+		List<IInterpretationResult> result;
+		IOclInterpreter interpreter;
+
+		/* Create or use a cached interpreter. */
+//		if (cachedInterpreters.containsKey(modelInstance)) {
+//			interpreter = cachedInterpreters.get(modelInstance);
+//		}
+
+//		else {
+			interpreter = OclInterpreterPlugin.createInterpreter(modelInstance);
+//			cachedInterpreters.put(modelInstance, interpreter);
+//		}
+
+		result = interpreter.interpretPreConditions(modelInstanceElement,
+				operation, parameters.toArray(new IModelInstanceElement[0]),
+				preConditions);
+
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public static List<IInterpretationResult> interpretPostConditions(
+			IModelInstance modelInstance,
+			IModelInstanceElement modelInstanceElement, Operation operation,
+			List<IModelInstanceElement> parameters,
+			IModelInstanceElement resultValue,
+			Collection<Constraint> postConditions)
+			throws IllegalArgumentException {
+
+		if (modelInstance == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'modelInstance' must not be null.");
+		}
+
+		else if (modelInstanceElement == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'modelInstanceElement' must not be null.");
+		}
+
+		else if (operation == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'operation' must not be null.");
+		}
+
+		else if (parameters == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'parameters' must not be null.");
+		}
+
+		else if (postConditions == null) {
+			throw new IllegalArgumentException(
+					"Parameter 'postConditions' must not be null.");
+		}
+		// no else.
+
+		List<IInterpretationResult> result;
+		IOclInterpreter interpreter;
+
+		/* Create or use a cached interpreter. */
+	//	if (cachedInterpreters.containsKey(modelInstance)) {
+			//interpreter = cachedInterpreters.get(modelInstance);
+		//}
+
+//		else {
+			interpreter = OclInterpreterPlugin.createInterpreter(modelInstance);
+	//		cachedInterpreters.put(modelInstance, interpreter);
+//		}
+
+		result = interpreter.interpretPostConditions(modelInstanceElement,
+				operation, parameters.toArray(new IModelInstanceElement[0]),
+				resultValue, postConditions);
+
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public List<Constraint> parseOclConstraints(IModel model,String oclCode)
 			throws IOException, ParseException {
 		
 		return Ocl22Parser.INSTANCE.parseOclString(oclCode, model);
 	}
+	
+	 public static long copy(InputStream from, OutputStream to)
+	      throws IOException {
+	    //checkNotNull(from);
+	    //checkNotNull(to);
+	    byte[] buf = new byte[1024];
+	    long total = 0;
+	    while (true) {
+	      int r = from.read(buf);
+	      if (r == -1) {
+	        break;
+	      }
+	      to.write(buf, 0, r);
+	      total += r;
+	    }
+	    return total;
+	  }	
+	
 	
 	/**
 	 * Parses the OCL constraints in a given URI and returns a list of

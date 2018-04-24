@@ -1,6 +1,5 @@
 package eu.sarunas.atf.eclipse.generators;
 
-import org.eclipse.core.internal.utils.FileUtil;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -13,12 +12,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.core.PackageFragment;
-import org.eclipse.jdt.internal.core.PackageFragmentRoot;
-import eu.atac.atf.eclipse.ATACPlug;
-import eu.atac.atf.main.ATF;
 import eu.sarunas.atf.eclipse.utils.ProjectManager;
-import eu.sarunas.atf.meta.sut.Project;
 
 /**
  * Creates tests package and stores all JUnit test code.
@@ -131,7 +125,7 @@ public class EclipseTestsWriter
 				}
 			}
 		} catch (Exception e) {
-			ATF.log(e);
+			e.printStackTrace();
 	}		
 		
 		

@@ -12,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import tudresden.ocl20.pivot.standalone.facade.StandaloneFacade;
-import eu.atac.atf.main.Files;
 import eu.sarunas.atf.meta.sut.Field;
 import eu.sarunas.atf.meta.sut.Modifier;
 import eu.sarunas.atf.meta.sut.Project;
@@ -29,6 +28,7 @@ import eu.sarunas.atf.meta.testdata.TestObjectCollection;
 import eu.sarunas.atf.meta.testdata.TestObjectComplex;
 import eu.sarunas.atf.meta.testdata.TestObjectField;
 import eu.sarunas.atf.meta.testdata.TestObjectSimple;
+import eu.sarunas.projects.atf.junk.Files;
 import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class TestDataValidatorTests
@@ -62,11 +62,11 @@ public class TestDataValidatorTests
 			for (java.lang.reflect.Field m : cls.getDeclaredFields()) {
 				Field fieldBalance = null;
 				if(m.getName().equals("operand")){
-					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), Modifier.Public, new CollectionType(CollectionStyle.List,getType("Operand",rootPackage)) , metaClass, null);
+					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), EnumSet.of(Modifier.Public), new CollectionType(CollectionStyle.List,getType("Operand",rootPackage)) , metaClass, null);
 				}else if(m.getName().equals("calculationNominalElement")){
-					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), Modifier.Public, new CollectionType(CollectionStyle.List,getType("CalculationNominalElement",rootPackage)) , metaClass, null);
+					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), EnumSet.of(Modifier.Public), new CollectionType(CollectionStyle.List,getType("CalculationNominalElement",rootPackage)) , metaClass, null);
 				}else{
-					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), Modifier.Public, getType(m.getType().getName(),rootPackage), metaClass, null);
+					fieldBalance = new eu.sarunas.atf.meta.sut.Field(m.getName(), EnumSet.of(Modifier.Public), getType(m.getType().getName(),rootPackage), metaClass, null);
 				}
 				
 				metaClass.addField(fieldBalance);
@@ -261,7 +261,7 @@ public class TestDataValidatorTests
 		Project model = new Project("BasicTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
 		eu.sarunas.atf.meta.sut.Class accountClass = new eu.sarunas.atf.meta.sut.Class("Account", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", Modifier.Public, new IntegerType(), accountClass, null);
+		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", EnumSet.of(Modifier.Public), new IntegerType(), accountClass, null);
 
 		rootPackage.addClass(accountClass);
 		model.addPackage(rootPackage);
@@ -287,7 +287,7 @@ public class TestDataValidatorTests
 		Project model = new Project("BasicTypeModel", null);
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
 		eu.sarunas.atf.meta.sut.Class accountClass = new eu.sarunas.atf.meta.sut.Class("Account", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", Modifier.Public, new IntegerType(), accountClass, null);
+		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", EnumSet.of(Modifier.Public), new IntegerType(), accountClass, null);
 
 		rootPackage.addClass(accountClass);
 		model.addPackage(rootPackage);
@@ -314,12 +314,12 @@ public class TestDataValidatorTests
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
 
 		eu.sarunas.atf.meta.sut.Class personClass = new eu.sarunas.atf.meta.sut.Class("Person", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldAge = new eu.sarunas.atf.meta.sut.Field("age", Modifier.Public, new IntegerType(), personClass, null);
+		Field fieldAge = new eu.sarunas.atf.meta.sut.Field("age", EnumSet.of(Modifier.Public), new IntegerType(), personClass, null);
 		personClass.addField(fieldAge);
 
 		eu.sarunas.atf.meta.sut.Class accountClass = new eu.sarunas.atf.meta.sut.Class("Account", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", Modifier.Public, new IntegerType(), accountClass, null);
-		Field fieldPerson = new eu.sarunas.atf.meta.sut.Field("holder", Modifier.Public, personClass, accountClass, null);
+		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", EnumSet.of(Modifier.Public), new IntegerType(), accountClass, null);
+		Field fieldPerson = new eu.sarunas.atf.meta.sut.Field("holder", EnumSet.of(Modifier.Public), personClass, accountClass, null);
 
 		rootPackage.addClass(accountClass);
 		rootPackage.addClass(personClass);
@@ -352,12 +352,12 @@ public class TestDataValidatorTests
 		eu.sarunas.atf.meta.sut.Package rootPackage = new eu.sarunas.atf.meta.sut.Package(model, "test.model", null);
 
 		eu.sarunas.atf.meta.sut.Class personClass = new eu.sarunas.atf.meta.sut.Class("Person", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldAge = new eu.sarunas.atf.meta.sut.Field("age", Modifier.Public, new IntegerType(), personClass, null);
+		Field fieldAge = new eu.sarunas.atf.meta.sut.Field("age", EnumSet.of(Modifier.Public), new IntegerType(), personClass, null);
 		personClass.addField(fieldAge);
 
 		eu.sarunas.atf.meta.sut.Class accountClass = new eu.sarunas.atf.meta.sut.Class("Account", EnumSet.of(Modifier.Public), rootPackage, null);
-		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", Modifier.Public, new IntegerType(), accountClass, null);
-		Field fieldPerson = new eu.sarunas.atf.meta.sut.Field("holder", Modifier.Public, personClass, accountClass, null);
+		Field fieldBalance = new eu.sarunas.atf.meta.sut.Field("balance", EnumSet.of(Modifier.Public), new IntegerType(), accountClass, null);
+		Field fieldPerson = new eu.sarunas.atf.meta.sut.Field("holder", EnumSet.of(Modifier.Public), personClass, accountClass, null);
 
 		rootPackage.addClass(accountClass);
 		rootPackage.addClass(personClass);

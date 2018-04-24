@@ -1,6 +1,7 @@
 package eu.sarunas.atf.meta.sut;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import eu.sarunas.atf.meta.sut.basictypes.VoidType;
 import eu.sarunas.atf.meta.sut.body.ICodeBodyElement;
@@ -8,7 +9,7 @@ import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class Method extends Element
 {
-	public Method(Class parent, String name, Modifier modifier, Type returnType, Object sourceElement)
+	public Method(Class parent, String name, EnumSet<Modifier> modifier, Type returnType, Object sourceElement)
 	{
 		super(name, sourceElement);
 		this.parent = parent;
@@ -41,7 +42,7 @@ public class Method extends Element
 		return this.exceptions;
 	};
 
-	public Modifier getModifier()
+	public EnumSet<Modifier> getModifier()
 	{
 		return this.modifer;
 	};
@@ -86,9 +87,9 @@ public class Method extends Element
 	};
 
 	protected List<Exception> exceptions = new ArrayList<Exception>();
-	protected Type returnType = new VoidType();
-	protected Class parent = null;
-	protected Modifier modifer = Modifier.None;
+	protected Type returnType;
+	protected Class parent;
+	protected EnumSet<Modifier> modifer;
 	protected List<ICodeBodyElement> elements = new ArrayList<ICodeBodyElement>();
 	protected List<Parameter> parameters = new ArrayList<Parameter>();
 };

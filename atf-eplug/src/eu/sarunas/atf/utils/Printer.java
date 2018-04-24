@@ -75,7 +75,7 @@ public class Printer
 	
 	public void print(Field field)
 	{
-		out.println(field.getModifier() + " " + field.getType().getName() + " " + field.getName() + ";");
+		out.println(field.getModifiers().toString() + " " + field.getType().getName() + " " + field.getName() + ";");
 	};
 	
 	public void print(Constructor constructor)

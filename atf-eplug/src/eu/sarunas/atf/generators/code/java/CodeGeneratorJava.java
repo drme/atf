@@ -9,10 +9,12 @@ import java.util.Locale;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import eu.sarunas.atf.generators.code.ICodeGenerator;
+import eu.sarunas.atf.generators.code.InlineCode;
 import eu.sarunas.atf.generators.code.TestObjectVariable;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Field;
 import eu.sarunas.atf.meta.sut.Method;
+import eu.sarunas.atf.meta.sut.Modifier;
 import eu.sarunas.atf.meta.sut.ParameterizedClass;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
 import eu.sarunas.atf.meta.sut.body.ArrayConstruct;
@@ -143,7 +145,7 @@ public class CodeGeneratorJava implements ICodeGenerator
     
     private String formatMethodCall(MethodCall methodCall, int tabs)
     {
-    	return formatMethodCall( methodCall, tabs,true);
+    	return formatMethodCall( methodCall, tabs, true);
     }
     
     private String formatMethodCall(MethodCall methodCall, int tabs, boolean end)
@@ -152,11 +154,11 @@ public class CodeGeneratorJava implements ICodeGenerator
     	
 		if (null != methodCall.getReturnObjectName())
 		{
-			result += methodCall.getMethod().getReturnType().getFullName() + " " + methodCall.getReturnObjectName() + " = " + methodCall.getObjectName() + "." + methodCall.getMethod().getName() + "(";
+			result += methodCall.getMethod().getReturnType().getFullName() + " " + methodCall.getReturnObjectName() + " = " + formatObjectName(methodCall) + "." + methodCall.getMethod().getName() + "(";
 		}
 		else
 		{
-			result += methodCall.getObjectName() + "." + methodCall.getMethod().getName() + "(";
+			result += formatObjectName(methodCall) + "." + methodCall.getMethod().getName() + "(";
 		}
 		
 		if (methodCall.getPrameters().size() > 0)
@@ -179,6 +181,18 @@ public class CodeGeneratorJava implements ICodeGenerator
 		return result;
     };
 
+	private String formatObjectName(MethodCall call)
+	{
+		if (call.getMethod().getModifier().contains(Modifier.Static))
+		{
+			return formatClassName(call.getMethod().getParent());
+		}
+		else
+		{
+			return call.getObjectName();
+		}
+	};    
+    
 	private String formatArrayElementAssignment(ArrayElementAssignment elementAssignment, int tabs)
 	{
 		return getTabs(tabs) + elementAssignment.getArray().getObjectName() + "[" + elementAssignment.getIndex() + "] = " + toString(elementAssignment.getValue()) + ";\n";
@@ -196,7 +210,7 @@ public class CodeGeneratorJava implements ICodeGenerator
 //			MethodCall getCall = new MethodCall(getter, fieldAsignment.getObject().getObjectName(), null);
 //			return getTabs(tabs) + formatMethodCall(getCall, 0,false) + ".add(" + toString(fieldAsignment.getValue()) +");\n" ;
 //    	}else 
-    	if (true == fieldAsignment.getField().getModifier().isPublic())
+    	if (true == fieldAsignment.getField().getModifiers().contains(Modifier.Public))
     	{
     		return pre + fieldAsignment.getField().getName() + " = " + toString(fieldAsignment.getValue()) + ";\n";
     	}
@@ -283,6 +297,10 @@ public class CodeGeneratorJava implements ICodeGenerator
     		}
     		
     		return result + "\"";
+    	}
+    	else if (object instanceof InlineCode)
+    	{
+    		return ((InlineCode)object).getCode();
     	}
     	else if (object instanceof TestObjectCollection)
     	{
@@ -465,7 +483,7 @@ public class CodeGeneratorJava implements ICodeGenerator
     	
     	for (Method method : field.getParent().getMethods())
     	{
-    		if ((true == method.getModifier().isPublic()) && (1 == method.getParameters().size()) && (true == methodName.equals(method.getName())))
+    		if ((true == method.getModifier().contains(Modifier.Public)) && (1 == method.getParameters().size()) && (true == methodName.equals(method.getName())))
     		{
     			return method;
     		}
@@ -480,7 +498,7 @@ public class CodeGeneratorJava implements ICodeGenerator
     	
     	for (Method method : field.getParent().getMethods())
     	{
-    		if ((true == method.getModifier().isPublic()) && (true == methodName.equals(method.getName())))
+    		if ((true == method.getModifier().contains(Modifier.Public)) && (true == methodName.equals(method.getName())))
     		{
     			return method;
     		}

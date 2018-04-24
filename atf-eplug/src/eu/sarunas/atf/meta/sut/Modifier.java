@@ -4,17 +4,12 @@ public enum Modifier
 {
 	None(0),
 	Public(1),
-	Abstract(2);
+	Abstract(2),
+	Static(4);
 
 	Modifier(int value)
 	{
 		this.value = value;
-	};
-	
-	@Deprecated
-	public boolean isPublic()
-	{
-		return (this.value & Public.value) > 0;
 	};
 	
 	@Deprecated

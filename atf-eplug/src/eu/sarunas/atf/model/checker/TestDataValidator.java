@@ -1,53 +1,87 @@
 package eu.sarunas.atf.model.checker;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import tudresden.ocl20.pivot.essentialocl.expressions.impl.ExpressionInOclImpl;
-import tudresden.ocl20.pivot.essentialocl.standardlibrary.OclBoolean;
-import tudresden.ocl20.pivot.interpreter.IInterpretationResult;
-import tudresden.ocl20.pivot.model.IModel;
-import tudresden.ocl20.pivot.modelinstance.IModelInstance;
-import tudresden.ocl20.pivot.parser.SemanticException;
-import tudresden.ocl20.pivot.pivotmodel.Constraint;
-import tudresden.ocl20.pivot.standalone.facade.StandaloneFacade;
-import eu.atac.atf.main.Files;
+import antlr.SemanticException;
 import eu.sarunas.atf.generators.code.xml.TransformerXML;
 import eu.sarunas.atf.generators.code.xsd.TransformerXSD;
 import eu.sarunas.atf.generators.model.dresden.ProjectModel;
+import eu.sarunas.atf.generators.model.dresden.WrapperModelInstance;
+import eu.sarunas.atf.generators.model.dresden.WrapperModelInstanceObject;
 import eu.sarunas.atf.meta.sut.Class;
+import eu.sarunas.atf.meta.sut.Method;
 import eu.sarunas.atf.meta.sut.Package;
 import eu.sarunas.atf.meta.sut.Project;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
 import eu.sarunas.atf.meta.testdata.TestObject;
-import eu.sarunas.atf.utils.FileUtils;
+import eu.sarunas.atf.meta.testdata.TestObjectCollection;
+import eu.sarunas.atf.meta.testdata.TestObjectComplex;
+import eu.sarunas.atf.meta.tests.TestInput;
+import eu.sarunas.atf.meta.tests.TestInputParameter;
 import eu.sarunas.atf.utils.Logger;
+import tudresden.ocl20.pivot.essentialocl.expressions.impl.ExpressionInOclImpl;
+import tudresden.ocl20.pivot.essentialocl.standardlibrary.OclBoolean;
+import tudresden.ocl20.pivot.interpreter.IInterpretationResult;
+import tudresden.ocl20.pivot.interpreter.OclInterpreterPlugin;
+import tudresden.ocl20.pivot.modelinstance.IModelInstance;
+import tudresden.ocl20.pivot.modelinstancetype.types.IModelInstanceElement;
+import tudresden.ocl20.pivot.modelinstancetype.types.base.JavaModelInstanceReal;
+import tudresden.ocl20.pivot.parser.ParseException;
+import tudresden.ocl20.pivot.pivotmodel.Constraint;
+import tudresden.ocl20.pivot.pivotmodel.Operation;
+import tudresden.ocl20.pivot.standalone.facade.StandaloneFacade;
+import tudresden.ocl20.pivot.tools.template.exception.TemplateException;
 
 /**
  * Validates if test data matches model and its' constraints.
  */
 public class TestDataValidator implements ITestDataValidator
 {
-	public TestDataValidator(Project model, String contraints)
+	public TestDataValidator(Project model, List<String> constraintsList) throws TemplateException, IOException, ParseException
 	{
 		this.model = model;
-		this.contraints = contraints;
+		
+		StandaloneFacade.INSTANCE.initialize(null);
+		
+		this.projectModel = new ProjectModel(this.model);		
+		
+		for (String constraints : constraintsList)
+		{
+			try
+			{
+			this.constraints.addAll(StandaloneFacade.INSTANCE.parseOclConstraints(this.projectModel, constraints));
+			}
+			catch (tudresden.ocl20.pivot.parser.SemanticException ex)
+			{
+				ex.printStackTrace();;
+			}
+		}
 	};
 	
 	@Override
 	public TestDataValidationResult validate(TestObject testDataToValidate) throws Exception
 	{
-		return validate(this.model, this.contraints, testDataToValidate);
+		return validate(this.model, new ArrayList<String>(), testDataToValidate);
 	};
 	
 	@Override
 	public TestDataValidationResult validate(Project model, String contraints, TestObject testDataToValidate) throws Exception
 	{
+		List<String> list = new ArrayList<String>();
+		list.add(contraints);
+		
+		return validate(model, list, testDataToValidate);
+	};
+	
+	@Override
+	public TestDataValidationResult validate(Project model, List<String> contraints, TestObject testDataToValidate) throws Exception
+	{
 		TestDataValidationResult result = validateModel(model, testDataToValidate);
 
 		if (true == result.isValid())
 		{
-			return validateConstraints(model, contraints, testDataToValidate);
+			return validateConstraints(model, testDataToValidate);
 		}
 		else
 		{
@@ -72,20 +106,15 @@ public class TestDataValidator implements ITestDataValidator
 	 * Validates if testDataToValidate objects matches model constraints. The validation object is returned that states if data are valid or not. Id data is not valid, validation object contains information about failed validation. For example: failed OCL constraint, etc.
 	 * 
 	 * @param model model to validate against to.
-	 * @param contraints model constraints to validate against to.
 	 * @param testDataToValidate test data to validate.
 	 * @return validation result object.
 	 */
-	private TestDataValidationResult validateConstraints(Project project, String contraints, TestObject testDataToValidate) throws Exception
+	private TestDataValidationResult validateConstraints(Project project, TestObject testDataToValidate) throws Exception
 	{
-		if ((null == contraints) || (contraints.trim().length() == 0))
+		if ((null == this.constraints) || (this.constraints.size() == 0))
 		{
 			return new TestDataValidationResult(true);
 		}
-
-		File modelFile = null;
-		File modelInstanceFile = null;
-		File oclFile = null;
 
 		try
 		{
@@ -149,16 +178,24 @@ public class TestDataValidator implements ITestDataValidator
 				return new TestDataValidationResult(true);
 			}
 
-			StandaloneFacade.INSTANCE.initialize(null);
-
-			modelFile = File.createTempFile("model", ".xsd");
-//			Files.writeToFile(new TransformerXSD().generatePackage(pckg), modelFile);
-			Files.writeToFile(new TransformerXSD().generateProject(project), modelFile);
-
-			
 			TransformerXML transformerXML = new TransformerXML();
 			List<Class> classes = transformerXML.getAllClasses(testDataToValidate, packageName);
-			List<String> modelInstances = transformerXML.transformTestObject(testDataToValidate, packageName);
+			
+			List<IModelInstance> modelInstances = new ArrayList<IModelInstance>();
+			
+			if (testDataToValidate instanceof TestObjectCollection)
+			{
+//				transformTestObject(testDataToValidate, packageName, result);
+			}
+			else
+			{
+			//	result.add(transform(testDataToValidate, packageName));
+				
+				modelInstances.add(new WrapperModelInstance(this.projectModel, testDataToValidate, this.projectModel));
+			}			
+			
+			
+			
 
 			List<String> classesNames = new ArrayList<String>();
 			
@@ -166,31 +203,16 @@ public class TestDataValidator implements ITestDataValidator
 			{
 				classesNames.add(TransformerXSD.getNameSpaceName(clss.getPackage()) + clss.getName());
 			}
-			
-				IModel model = StandaloneFacade.INSTANCE.loadXSDModel(modelFile);
-		//	IModel model = new ProjectModel(project);
-			//IModel model = new JavaModel(project);
-			
-			oclFile = File.createTempFile("ocl", ".ocl");
 
-			// Dresden tool does not support class (context) which has '_' //Hack for namespace
-
-		//	contraints = contraints.replaceFirst(packageName.replaceAll("\\.", "::"), packageName.replaceAll("[\\._]", ""));
-			
-			contraints = patchConstraints(contraints, project);
-			
-			Files.writeToFile(contraints, oclFile);
-
-			return new TestDataValidationResult(validate(oclFile, model, modelInstances, modelFile, classesNames));
+			return new TestDataValidationResult(validate(modelInstances, classesNames));
 		}
 		finally
 		{
-			FileUtils.deleteFile(modelFile);
-			FileUtils.deleteFile(modelInstanceFile);
-			FileUtils.deleteFile(oclFile);
 		}
 	};
 
+	/*
+	
 	private String patchConstraints(String constraints, Project project)
 	{
 		String[] lines = constraints.split("\n");
@@ -247,28 +269,20 @@ public class TestDataValidator implements ITestDataValidator
 		return constraints;
 	};
 	
+	*/
+	
 	private String getOclPackageName(Package packge)
 	{
 		return packge.getName().replaceAll("\\.", "::");
 	};
 	
-	private boolean validate(File oclFile, IModel model, List<String> modelInstances, File modelFile, List<String> types) throws InvalidOCLException
+	private boolean validate(List<IModelInstance> modelInstances, List<String> types) throws InvalidOCLException
 	{
-		File modelInstanceFile = null;
-
 		try
 		{
-			List<Constraint> constraintList = StandaloneFacade.INSTANCE.parseOclConstraints(model, oclFile);
-
-			for (String string : modelInstances)
+			for (IModelInstance modelInstance : modelInstances)
 			{
-				modelInstanceFile = File.createTempFile("modelInstance", ".xml");
-
-				Files.writeToFile(string, modelInstanceFile);
-
-				IModelInstance modelInstance = StandaloneFacade.INSTANCE.loadXMLModelInstance(model, modelInstanceFile);
-
-				for (IInterpretationResult result : StandaloneFacade.INSTANCE.interpretEverything(modelInstance, constraintList))
+				for (IInterpretationResult result : StandaloneFacade.INSTANCE.interpretEverything(modelInstance, this.constraints))
 				{
 					Logger.logger.info("  " + result.getModelObject() + " (" + result.getConstraint().getKind() + ": " + result.getConstraint().getSpecification().getBody() + "): " + result.getResult());
 
@@ -307,15 +321,7 @@ public class TestDataValidator implements ITestDataValidator
 						return false;
 					}
 				}
-
-				FileUtils.deleteFile(modelInstanceFile);
 			}
-		}
-		catch (SemanticException ex)
-		{
-			Logger.log(ex);
-
-			throw new InvalidOCLException(ex);
 		}
 		catch (Throwable ex)
 		{
@@ -323,17 +329,73 @@ public class TestDataValidator implements ITestDataValidator
 
 			return false;
 		}
-		finally
-		{
-			if (modelInstanceFile != null)
-			{
-				modelInstanceFile.delete();
-			}
-		}
 
 		return true;
 	};
 
+	@Override
+	public TestDataValidationResult validate(Method method, TestInput testInput) throws Exception
+	{
+		OclInterpreterPlugin p = new OclInterpreterPlugin();
+		
+		TestObject hhh = new TestObjectComplex("a1", method.getParent());
+		
+		IModelInstance modelInstance = new WrapperModelInstance(this.projectModel, hhh, this.projectModel);
+		IModelInstanceElement modelInstanceElement = new WrapperModelInstanceObject(hhh, null, this.projectModel);
+		Operation operation = this.projectModel.getOperation(method);
+		List<IModelInstanceElement> parameters = new ArrayList<>();
+		
+		for (TestInputParameter parameter : testInput.getInputParameters())
+		{
+			parameters.add(this.projectModel.getInstance(parameter.getValue(), parameter.getParameter().getType()));
+		}
+		
+		for (IInterpretationResult result : StandaloneFacade.interpretPreConditions(modelInstance, modelInstanceElement, operation, parameters, this.constraints))
+		{
+			Logger.logger.info("  " + result.getModelObject() + " (" + result.getConstraint().getKind() + ": " + result.getConstraint().getSpecification().getBody() + "): " + result.getResult());
+
+			if (result.getResult() instanceof OclBoolean)
+			{
+				//OclBoolean oclBoolean = (OclBoolean) result.getResult();
+				ExpressionInOclImpl expressionInOclImpl = (ExpressionInOclImpl) result.getConstraint().getSpecification();
+
+				//Logger.logger.info("TestDataValidator.validate(): " + result.getConstraint().getSpecification().getBody());
+				//Logger.logger.info("TestDataValidator.validate(): " + oclBoolean.getInvalidReason().getMessage());
+/* utter rubbish 
+				boolean exists = false;
+
+				for (String type : types)
+				{
+					if (expressionInOclImpl.getContext().getType().getName().equals(type))
+					{
+						exists = true;
+						break;
+					}
+				}
+
+				if (false == exists)
+				{
+					continue;
+				}
+*/
+				if (false == ((OclBoolean) result.getResult()).isTrue())
+				{
+					return new TestDataValidationResult(false);
+				}
+
+			}
+			else
+			{
+				return new TestDataValidationResult(false);
+			}
+		}
+
+		return new TestDataValidationResult(true);
+	};
+	
+	
+	
+	
 	private boolean isBasicType(String testObjectFullTypeName)
 	{
 		if (testObjectFullTypeName.equals("int") || testObjectFullTypeName.equals("double") || testObjectFullTypeName.equals("float") || testObjectFullTypeName.equals("byte") || testObjectFullTypeName.equals("short"))
@@ -344,6 +406,7 @@ public class TestDataValidator implements ITestDataValidator
 	}
 
 
-	private Project model = null;
-	private String contraints = null;
+	private ProjectModel projectModel;
+	private Project model;
+	private List<Constraint> constraints = new ArrayList<>();
 };

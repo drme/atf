@@ -1,11 +1,7 @@
 package eu.sarunas.atf.generators.tests;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
-import nl.flotsam.xeger.Xeger;
-import eu.atac.atf.main.ATF;
-import eu.atac.atf.main.ATFException;
 import eu.sarunas.atf.generators.tests.data.Randomizer;
 import eu.sarunas.atf.meta.sut.Method;
 import eu.sarunas.atf.meta.sut.Parameter;
@@ -15,9 +11,7 @@ import eu.sarunas.atf.meta.tests.TestInputParameter;
 import eu.sarunas.atf.meta.tests.TestProject;
 import eu.sarunas.atf.meta.tests.TestSuite;
 import eu.sarunas.atf.model.checker.ITestDataValidator;
-import eu.sarunas.atf.utils.Logger;
-import eu.sarunas.projects.atf.generators.value.RVBigDecimal;
-import eu.sarunas.projects.atf.metadata.generic.Type;
+import nl.flotsam.xeger.Xeger;
 
 public class RandomGenerator implements ITestGenerator
 {
@@ -30,7 +24,7 @@ public class RandomGenerator implements ITestGenerator
 	{
 		assert (null != method);
 
-		TestSuite tests = new TestSuite(project, "TestSuite" + method.getName());
+		TestSuite tests = new TestSuite(project, "TestSuite" + method.getParent().getName() + method.getName().toUpperCase().substring(0, 1) + method.getName().substring(1));
 
 		while (false == manager.isDone())
 		{
@@ -131,36 +125,7 @@ public class RandomGenerator implements ITestGenerator
 		return INSTANCE;
 	}
 
-	@Deprecated
-	public String generate(Type type)
-	{
-		if (false == type.isReferenceType())
-		{
-			if (type.getFullName().equals(ATF.JAVA_TYPE_INT))
-			{
-				return Integer.toString(generateRandomInt());
-			}
-			else if (type.getFullName().equals(ATF.JAVA_TYPE_DOUBLE))
-			{
-				return String.format("%1$," + ATF.ATF_DOUBLE_FORMAT, generateRandomDouble());
-			}
-			else
-			{
-				Logger.logger.severe(type.getFullName());
-				throw new ATFException(ATFException.ATF_UNIMPLEMENTED_CODE_1000);
-			}
-
-		}
-		else
-		{
-			throw new ATFException(ATFException.ATF_UNIMPLEMENTED_CODE_1000, type.getFullName());
-			// if(type.getFullName().equals("BigDecimal")){
-			// return String.format("new BigDecimal(%1$," + ATF.ATF_DOUBLE_FORMAT + ")", generateRandomDouble());
-			// }else {
-			//
-			// }
-		}
-	}
+	
 	
 	@Deprecated
 	public int generateRandomInt(){
@@ -210,7 +175,7 @@ public class RandomGenerator implements ITestGenerator
 	}
 	
 	@Deprecated
-	public RVBigDecimal randomBigDecimal(){
-		return new RVBigDecimal(new BigDecimal(random.nextDouble()));
+	public Double randomBigDecimal(){
+		return random.nextDouble();
 	}
 }

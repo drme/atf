@@ -261,13 +261,13 @@ public class JavaProjectParser implements IModelParser
 		}
 	};
 	
-	private Modifier getAccessLevel(int flags)
+	private EnumSet<Modifier> getAccessLevel(int flags)
 	{
-		Modifier result = Modifier.None;
+		EnumSet<Modifier> result = EnumSet.noneOf(Modifier.class);
 		
 		if (Flags.isPublic(flags))
 		{
-			result = Modifier.Public;
+			result.add(Modifier.Public);
 		}
 		
 		return result;
@@ -275,7 +275,7 @@ public class JavaProjectParser implements IModelParser
 	
 	private Method transformMethod(IMethod m, Class c) throws JavaModelException
 	{
-		Method method = new Method(c, m.getElementName(), Modifier.Public, transformType(m.getReturnType(), m.getCompilationUnit()),  m);
+		Method method = new Method(c, m.getElementName(), EnumSet.of(Modifier.Public), transformType(m.getReturnType(), m.getCompilationUnit()),  m);
 
 		for (int i = 0; i < m.getParameterNames().length; i++)
 		{
@@ -287,7 +287,7 @@ public class JavaProjectParser implements IModelParser
 
 	private Constructor transformConstructor(IMethod method, Class c) throws JavaModelException
 	{
-		Constructor constructor = new Constructor(c, method.getElementName(), Modifier.Public, typeVoid, method);
+		Constructor constructor = new Constructor(c, method.getElementName(), EnumSet.of(Modifier.Public), typeVoid, method);
 
 		for (int i = 0; i < method.getParameterNames().length; i++)
 		{

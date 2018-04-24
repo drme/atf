@@ -2,13 +2,19 @@ package eu.sarunas.atf.generators.code.junit;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import eu.sarunas.atf.generators.code.ITestTransformer;
+import eu.sarunas.atf.generators.code.InlineCode;
 import eu.sarunas.atf.generators.code.TestObjectVariable;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Method;
 import eu.sarunas.atf.meta.sut.Modifier;
+import eu.sarunas.atf.meta.sut.Package;
+import eu.sarunas.atf.meta.sut.Parameter;
 import eu.sarunas.atf.meta.sut.ParameterizedClass;
+import eu.sarunas.atf.meta.sut.basictypes.CollectionStyle;
 import eu.sarunas.atf.meta.sut.basictypes.CollectionType;
+import eu.sarunas.atf.meta.sut.basictypes.ObjectType;
 import eu.sarunas.atf.meta.sut.basictypes.VoidType;
 import eu.sarunas.atf.meta.sut.body.ArrayConstruct;
 import eu.sarunas.atf.meta.sut.body.ArrayElementAssignment;
@@ -30,15 +36,15 @@ import eu.sarunas.projects.atf.metadata.generic.Type;
 
 public class TestTransformerJUnit implements ITestTransformer
 {
-	public Class transformTest(TestSuite testSuite)
+	public Class transformTest(TestSuite testSuite, List<String> constraintsFiles)
 	{
-		Class cl = new Class("Test" + testSuite.getName(), EnumSet.of(Modifier.Public), testSuite.getTestCases().get(0).getPackage(), testSuite);
+		Class cl = new Class(testSuite.getName(), EnumSet.of(Modifier.Public), testSuite.getTestCases().get(0).getPackage(), testSuite);
 
 		int id = 0;
 
 		for (TestCase tc : testSuite.getTestCases())
 		{
-			transformTestCase(tc, cl, ++id);
+			transformTestCase(tc, cl, ++id, constraintsFiles);
 		}
 
 		return cl;
@@ -53,11 +59,11 @@ public class TestTransformerJUnit implements ITestTransformer
 		return "test" + methodName + id;
 	};
 	
-	private void transformTestCase(TestCase testCase, Class testClass, int id)
+	private void transformTestCase(TestCase testCase, Class testClass, int id, List<String> constraintsFiles)
 	{
 		Logger.logger.info("Transforming test to JUnit: " + testCase.toString());
 
-		Method testMethod = new Method(testClass, "test" + getTestMethodName(testCase.getMethod(), id), Modifier.Public, new VoidType(), null);
+		Method testMethod = new Method(testClass, getTestMethodName(testCase.getMethod(), id), EnumSet.of(Modifier.Public), new VoidType(), null);
 		testMethod.getAnnotations().add("org.junit.Test");
 
 		testClass.addMethod(testMethod);
@@ -95,7 +101,7 @@ public class TestTransformerJUnit implements ITestTransformer
 									v = unwapComplexCreation((TestObjectComplex) v, testMethod);
 								}
 
-								MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), construct.getObjectName(), null);
+								MethodCall addCall = new MethodCall(new Method(null, "add", EnumSet.of(Modifier.Public), null, null), construct.getObjectName(), null);
 
 								MethodCallParameter parameter = new MethodCallParameter(null, v);
 
@@ -158,7 +164,7 @@ public class TestTransformerJUnit implements ITestTransformer
 											v = unwapComplexCreation((TestObjectComplex) v, testMethod);
 										}
 
-										MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), c1.getObjectName(), null);
+										MethodCall addCall = new MethodCall(new Method(null, "add", EnumSet.of(Modifier.Public), null, null), c1.getObjectName(), null);
 
 										MethodCallParameter parameter = new MethodCallParameter(null, v);
 
@@ -203,9 +209,88 @@ public class TestTransformerJUnit implements ITestTransformer
 
 			testMethod.getImplementation().add(new LineSeperator());
 			testMethod.getImplementation().add(call);
+			
+			
+			
+			
+
+			
+			
+			
+			ObjectConstruct constructPreArguments = new ObjectConstruct(createList(new TestObjectCollection("", new CollectionType(CollectionStyle.Array, new ObjectType()), 0, CollectionStyle.Array)), "preValues" + varId++);
+			testMethod.getImplementation().add(constructPreArguments);
+
+			for (TestInputParameter p : testInput.getInputParameters())
+			{
+				if (preconstructedInputs.containsKey(p))
+				{
+					ObjectConstruct construct = preconstructedInputs.get(p);
+
+					MethodCall addCall = new MethodCall(new Method(null, "add", EnumSet.of(Modifier.Public), null, null), constructPreArguments.getObjectName(), null);
+
+					MethodCallParameter parameter = new MethodCallParameter(null, construct);
+
+					addCall.addParameter(parameter);
+
+					testMethod.getImplementation().add(addCall);
+				}
+				else
+				{
+					MethodCall addCall = new MethodCall(new Method(null, "add", EnumSet.of(Modifier.Public), null, null), constructPreArguments.getObjectName(), null);
+
+					MethodCallParameter parameter = new MethodCallParameter(null, p.getValue());
+
+					addCall.addParameter(parameter);
+
+					testMethod.getImplementation().add(addCall);
+				}
+			}
+			
+			
+			
+			
+			
+//		testMethod.getImplementation().add(new Assert());
+			
+			testMethod.getImplementation().add(new LineSeperator());
+			
+			Class assertClass = new Class("Assert", EnumSet.of(Modifier.Public), new Package(null, "eu.sarunas.atf.utils.junit", null), null);
+			
+			Method assertMethod = new Method(assertClass, "assertPostConditions", EnumSet.of(Modifier.Public, Modifier.Static), new VoidType(), null);
+			
+			MethodCall assertCall = new MethodCall(assertMethod, "", null);
+			
+			String testMethodName = "testObject.getClass().getMethod(\"" + testCase.getMethod().getName() + "\"";
+
+			for (Parameter parameter : testCase.getMethod().getParameters())
+			{
+				testMethodName += ", " + parameter.getType().getFullName() + ".class";
+			}
+			
+			testMethodName += ")";
+			
+			assertCall.addParameter(new MethodCallParameter("testObject", testObject));
+			assertCall.addParameter(new MethodCallParameter("method", new InlineCode(testMethodName)));
+			assertCall.addParameter(new MethodCallParameter("inputParameters", constructPreArguments));
+			assertCall.addParameter(new MethodCallParameter("result", new TestObjectVariable("res", null, new ObjectConstruct(null, "res"))));
+			
+			for (String constraintsFile : constraintsFiles)
+			{
+				assertCall.addParameter(new MethodCallParameter(null, new InlineCode("\"" + constraintsFile + "\"")));
+			}
+			
+			
+			
+			testMethod.getImplementation().add(assertCall);			
+				
+			
+			
 		}
 
-		testMethod.getImplementation().add(new Assert());
+		
+		
+				
+
 	};
 	
 	private TestObjectVariable unwapComplexCreation(TestObjectComplex object, Method methodCode)
@@ -237,7 +322,7 @@ public class TestTransformerJUnit implements ITestTransformer
 								v = unwapComplexCreation((TestObjectComplex) v, methodCode);
 							}
 
-							MethodCall addCall = new MethodCall(new Method(null, "add", Modifier.Public, null, null), c1.getObjectName(), null);
+							MethodCall addCall = new MethodCall(new Method(null, "add", EnumSet.of(Modifier.Public), null, null), c1.getObjectName(), null);
 
 							MethodCallParameter parameter = new MethodCallParameter(null, v);
 

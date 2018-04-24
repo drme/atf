@@ -1,0 +1,30 @@
+package eu.sarunas.junit;
+
+public class TestsHelper
+{
+	public static void set(Object object, String fieldName, Object value) throws Throwable
+	{
+		set(object, fieldName, value, object.getClass());
+	}
+
+	public static void set(Object object, String fieldName, Object value, Class<?> clss) throws Throwable
+	{
+		if (null != clss)
+		{
+			try
+			{
+				java.lang.reflect.Field f = clss.getDeclaredField(fieldName);
+				f.setAccessible(true);
+				f.set(object, value);
+			}
+			catch (NoSuchFieldException ex)
+			{
+				set(object, fieldName, value, clss.getSuperclass());
+			}
+		}
+		else
+		{
+			throw new NoSuchFieldException(fieldName);
+		}
+	}
+}

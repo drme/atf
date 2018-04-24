@@ -1,5 +1,6 @@
 package eu.sarunas.atf.generators.tests;
 
+import java.util.List;
 import eu.sarunas.atf.generators.tests.data.Randomizer;
 import eu.sarunas.atf.meta.sut.Class;
 import eu.sarunas.atf.meta.sut.Method;
@@ -15,8 +16,10 @@ import eu.sarunas.atf.utils.Logger;
 
 public class TestsGenerator
 {
-	public TestSuite generate(final Method method, TestProject project, final String constraints) throws Exception
+	public TestSuite generate(final Method method, TestProject project, List<String> constraints) throws Exception
 	{
+		final TestDataValidator validator = new TestDataValidator(method.getParent().getPackage().getProject(), constraints);
+		
 		return this.testsGenerator.generate(method, new ITestsGeneratorManager()
 		{
 			public boolean acceptTest(TestCase testCase) throws Exception
@@ -29,13 +32,20 @@ public class TestsGenerator
 						{
 							TestObjectComplex data = (TestObjectComplex) parameter.getValue();
 
-							if (false == this.validator.validate(data).isValid())
+							if (false == getValidator().validate(data).isValid())
 							{
 								Logger.logger.info("Discarded: " + data.toString());
 
 								return false;
 							}
 						}
+					}
+					
+					if (false == getValidator().validate(method, input).isValid())
+					{
+						Logger.logger.info("Discarded all input: " + input.toString());
+
+						return false;
 					}
 				}
 
@@ -52,20 +62,14 @@ public class TestsGenerator
 			@Override
 			public ITestDataValidator getValidator()
 			{
-				if (null == this.validator)
-				{
-					this.validator = new TestDataValidator(method.getParent().getPackage().getProject(), constraints);
-				}
-				
-				return this.validator;
+				return validator;
 			};
 			
 			private int count = 0;
-			private ITestDataValidator validator = null;
 		}, project);
 	};
 	
-	public TestSuite generate(Class cl, TestProject project, String constraints) throws Exception
+	public TestSuite generate(Class cl, TestProject project, List<String> constraints) throws Exception
 	{
 		TestSuite testSuites = new TestSuite(project, "TestSuite" + cl.getName());
 

@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.progress.IProgressConstants;
-import eu.sarunas.projects.atf.eclipse.actions.TypeNameExtractor;
 
 /**
  * Base class for eclipse plug-in actions. The action is run as a job with a progress indicator.
